@@ -30,7 +30,7 @@ export default function Services() {
     <section data-panel className="grid min-h-screen p-8 md:p-16 xl:p-24">
       <div className="flex flex-col justify-center md:items-end">
         <div className="flex flex-col items-center text-center md:mr-12 md:max-w-3xl xl:mr-24">
-          <h2 className="flex items-center justify-center gap-4 font-inter text-2xl font-light tracking-widest uppercase md:gap-6 md:text-6xl">
+          <h2 className="flex items-center justify-center gap-4 font-inter text-2xl font-extralight tracking-widest uppercase md:gap-6 md:text-6xl">
             <span
               aria-hidden="true"
               className="shrink-0 text-sm text-white/40 select-none"

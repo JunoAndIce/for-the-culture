@@ -8,7 +8,10 @@ export default function Home() {
         <p className="font-script text-[clamp(3.5rem,11vw,16rem)] leading-none">
           For the Culture
         </p>
-        <p className="font-inter text-md md:text-4xl font-light uppercase">
+        <p className="font-inter text-xs md:text-2xl font-black uppercase">
+          FTC Enterprises
+        </p>
+        <p className="font-inter text-lg md:text-4xl font-light uppercase">
           Let us build your vision together.
         </p>
         <p className="font-inter text-xs md:text-sm font-light uppercase md:w-[75ch] mt-4 md:mt-8">
