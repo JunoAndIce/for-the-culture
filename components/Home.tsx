@@ -8,7 +8,7 @@ export default function Home() {
         <p className="font-script text-[clamp(3.5rem,11vw,16rem)] leading-none">
           For the Culture
         </p>
-        <p className="font-inter text-md md:text-4xl font-extralight uppercase">
+        <p className="font-inter text-md md:text-4xl font-light uppercase">
           Let us build your vision together.
         </p>
         <p className="font-inter text-xs md:text-sm font-light uppercase md:w-[75ch] mt-4 md:mt-8">
@@ -34,13 +34,15 @@ export default function Home() {
         </div>
       </div>
 
-      <address className="font-inter text-xs leading-relaxed text-white/60 not-italic">
-        Based in Texas
-        <br />
-        Serving Worldwide
-        <br />
-        &copy; FTC 2026
-      </address>
+      <div className="flex items-end justify-between gap-4">
+        <address className="font-inter text-xs leading-relaxed text-white/60 not-italic">
+          Based in Texas
+          <br />
+          Serving Worldwide
+          <br />
+          &copy; FTC 2026
+        </address>
+      </div>
     </section>
   );
 }

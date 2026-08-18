@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Italianno } from "next/font/google";
+import { Gelasio, Geist, Geist_Mono, Inter, Italianno } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,6 +16,13 @@ const geistMono = Geist_Mono({
 // referencing itself. See globals.css.
 const inter = Inter({
   variable: "--font-inter-sans",
+  subsets: ["latin"],
+});
+
+// Named *-serif for the same reason as inter above: the Tailwind theme key
+// `--font-gelasio` can't reference a variable of its own name.
+const gelasio = Gelasio({
+  variable: "--font-gelasio-serif",
   subsets: ["latin"],
 });
 
@@ -38,7 +45,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${italianno.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${gelasio.variable} ${italianno.variable} antialiased`}
       >
         {children}
       </body>

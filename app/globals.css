@@ -12,6 +12,7 @@
   --font-mono: var(--font-geist-mono);
   --font-script: var(--font-italianno);
   --font-inter: var(--font-inter-sans);
+  --font-gelasio: var(--font-gelasio-serif);
 }
 
 @media (prefers-color-scheme: dark) {
