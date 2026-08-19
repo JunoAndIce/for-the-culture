@@ -202,3 +202,14 @@
   --typeset-leading: 1.75;
   --typeset-flow: 1.25em;
 }
+
+/* Logo ticker. Track holds two copies of the list; -50% lands copy two
+   exactly where copy one started, so the loop has no visible seam. */
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}

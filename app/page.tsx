@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Scene from "@/components/Scene";
 import ScrollChevron from "@/components/ScrollChevron";
 import Services from "@/components/Services";
+import Testimonials from "@/components/Testimonials";
 
 export default function Page() {
   return (
@@ -14,6 +15,7 @@ export default function Page() {
       <main className="relative z-10">
         <Home />
         <Services />
+        <Testimonials />
       </main>
     </div>
   );

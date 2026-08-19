@@ -40,12 +40,14 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
   desktop: [
     { x: 0.9, y: 0, rotY: 0, zoom: 1.8 },
     { x: -1.4, y: 0, rotY: Math.PI * 0.6, zoom: 1.2, opacity: 0.18 },
+    { x: 0, y: -0.3, rotY: Math.PI * 1.1, zoom: 2.2, opacity: 0.08 },
   ],
   // Behind the copy: drifts down the screen instead of across it, because a
   // portrait viewport has no horizontal room to move through.
   mobile: [
     { x: 0, y: 0.75, rotY: 0, zoom: 1.35 },
     { x: 0, y: 0, rotY: Math.PI * 0.6, opacity: 0.02 },
+    { x: 0, y: -0.9, rotY: Math.PI * 1.1, zoom: 1.6, opacity: 0.06 },
   ],
 };
 

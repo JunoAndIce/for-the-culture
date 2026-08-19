@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   "Projects",
   "Resources",
   "Family",
+  "Contact Us"
 ] as const;
 
 export default function Navbar() {
