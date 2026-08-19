@@ -16,20 +16,20 @@ export default function Navbar() {
   return (
     <nav className="fixed inset-x-0 top-0 z-20 p-6 md:p-12">
       {/* Desktop: centered row with dots between items. */}
-      <ul className="hidden flex-wrap items-center justify-center font-inter text-xs tracking-widest uppercase md:flex md:text-md lg:text-lg">
+      <ul className="hidden flex-wrap items-center justify-center text-xs tracking-widest uppercase md:flex md:text-md lg:text-lg">
         {NAV_ITEMS.map((item, i) => (
           <li key={item} className="flex items-center">
             {i > 0 && (
               <span
                 aria-hidden="true"
-                className="mx-3 text-white/40 select-none md:mx-5"
+                className="mx-3 text-foreground/40 select-none md:mx-5"
               >
                 &bull;
               </span>
             )}
             <a
               href="#"
-              className="text-white/70 transition-colors hover:text-white"
+              className="text-foreground/70 transition-colors hover:text-foreground"
             >
               {item}
             </a>
@@ -47,7 +47,7 @@ export default function Navbar() {
         className="-m-2 block p-2 md:hidden"
       >
         <svg
-          className={`ham hamRotate ham8${open ? " active" : ""}`}
+          className={`ham hamRotate ham8 text-foreground${open ? " active" : ""}`}
           viewBox="0 0 100 100"
           width={48}
         >
@@ -65,14 +65,14 @@ export default function Navbar() {
 
       <ul
         id="mobile-menu"
-        className={`${open ? "flex" : "hidden"} mt-4 flex-col gap-4 font-inter text-sm tracking-widest uppercase md:hidden`}
+        className={`${open ? "flex" : "hidden"} mt-4 flex-col gap-4 text-sm tracking-widest uppercase md:hidden`}
       >
         {NAV_ITEMS.map((item) => (
           <li key={item}>
             <a
               href="#"
               onClick={() => setOpen(false)}
-              className="text-white/70 transition-colors hover:text-white"
+              className="text-foreground/70 transition-colors hover:text-foreground"
             >
               {item}
             </a>

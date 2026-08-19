@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Gelasio, Geist, Geist_Mono, Inter, Italianno } from "next/font/google";
 import "./globals.css";
+import ThemeProvider from "@/components/ThemeProvider";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,11 +45,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${gelasio.variable} ${italianno.variable} antialiased`}
-      >
-        {children}
+    // Font vars live on <html>, not <body>: shadcn's base layer applies
+    // `font-sans` to <html>, which cannot see variables scoped to <body>.
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${gelasio.variable} ${italianno.variable}`}
+    >
+      <body className="antialiased">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <ThemeToggle />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

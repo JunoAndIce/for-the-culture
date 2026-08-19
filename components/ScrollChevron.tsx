@@ -10,7 +10,7 @@ export default function ScrollChevron() {
     <div className="pointer-events-none fixed right-0 bottom-0 z-20 p-8 md:p-16 xl:p-24">
       <span
         aria-hidden="true"
-        className="block animate-bounce text-white drop-shadow-[0_0_8px_rgba(0,0,0,0.9)] motion-reduce:animate-none"
+        className="block animate-bounce text-foreground drop-shadow-[0_0_8px_var(--background)] motion-reduce:animate-none"
       >
         <svg
           width="44"

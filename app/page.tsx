@@ -6,7 +6,7 @@ import Services from "@/components/Services";
 
 export default function Page() {
   return (
-    <div className="relative bg-black">
+    <div className="relative bg-background">
       <Scene />
       <Navbar />
       <ScrollChevron />
