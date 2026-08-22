@@ -6,6 +6,7 @@ import { gsap, useGSAP } from "@/lib/gsap";
 import {
   BREAKPOINT_MD,
   PANEL_SELECTOR,
+  SPHERE_LAYER_OPACITY,
   SPHERE_OPACITY,
   SPHERE_PATH,
   SPHERE_SCALE,
@@ -24,16 +25,25 @@ export type SphereNodes = {
   frame: RefObject<Object3D | null>;
   /** The scroll-driven spin and tilt, on their own node below the user's. */
   spin: RefObject<Object3D | null>;
-  /** The wireframe's material, whose opacity fades per panel. */
-  material: RefObject<Material | null>;
+  /** Solid landmasses. Fades per panel at its share of the panel's opacity. */
+  land: RefObject<Material | null>;
+  /** The wire lattice over the land. Fades with it, at its own share. */
+  wire: RefObject<Material | null>;
 };
 
 /** A panel's zoom is a multiplier on the layout's base scale. */
 const scaleFor = (state: SphereState, base: number) => base * (state.zoom ?? 1);
 
-/** A panel's opacity is absolute; it falls back to the theme's base. */
-const opacityFor = (state: SphereState, theme: SphereTheme) =>
-  state.opacity ?? SPHERE_OPACITY[theme];
+/**
+ * A panel's opacity is absolute and falls back to the theme's base. Each layer
+ * then takes its own share of it, so the two stay locked to one per-panel
+ * number instead of needing a value each in SPHERE_PATH.
+ */
+const opacityFor = (
+  state: SphereState,
+  theme: SphereTheme,
+  layer: keyof typeof SPHERE_LAYER_OPACITY,
+) => (state.opacity ?? SPHERE_OPACITY[theme]) * SPHERE_LAYER_OPACITY[layer];
 
 /** A panel's tilt is optional; upright is the default. */
 const tiltFor = (state: SphereState) => state.rotX ?? 0;
@@ -50,7 +60,8 @@ function orientAsAxis(spin: Object3D) {
 function buildTimeline(
   frame: Object3D,
   spin: Object3D,
-  material: Material,
+  land: Material,
+  wire: Material,
   path: SphereState[],
   base: number,
   theme: SphereTheme,
@@ -95,14 +106,15 @@ function buildTimeline(
     )
       .to(frame.scale, { x: scale, y: scale, z: scale, duration }, at)
       .to(spin.rotation, { x: tiltFor(state), y: state.rotY, duration }, at)
-      .to(material, { opacity: opacityFor(state, theme), duration }, at);
+      .to(land, { opacity: opacityFor(state, theme, "land"), duration }, at)
+      .to(wire, { opacity: opacityFor(state, theme, "wire"), duration }, at);
   });
 }
 
 /**
  * Drives the sphere along SPHERE_PATH as the panels scroll by.
  *
- * This hook is the sole owner of both nodes it is handed and of the material's
+ * This hook is the sole owner of both nodes it is handed and of both materials'
  * opacity — nothing renders position/rotation/scale/opacity as a prop, so a
  * React re-render can't snap them back mid-animation.
  *
@@ -121,8 +133,9 @@ export function useSphereScroll(nodes: SphereNodes, theme: SphereTheme) {
     () => {
       const frame = nodes.frame.current;
       const spin = nodes.spin.current;
-      const material = nodes.material.current;
-      if (!frame || !spin || !material) return;
+      const land = nodes.land.current;
+      const wire = nodes.wire.current;
+      if (!frame || !spin || !land || !wire) return;
 
       orientAsAxis(spin);
 
@@ -152,13 +165,15 @@ export function useSphereScroll(nodes: SphereNodes, theme: SphereTheme) {
             z: startScale,
           });
           gsap.set(spin.rotation, { x: tiltFor(start), y: start.rotY });
-          gsap.set(material, { opacity: opacityFor(start, theme) });
+          gsap.set(land, { opacity: opacityFor(start, theme, "land") });
+          gsap.set(wire, { opacity: opacityFor(start, theme, "wire") });
 
           // Reduced motion: stay locked to the scrollbar rather than easing toward it.
           buildTimeline(
             frame,
             spin,
-            material,
+            land,
+            wire,
             path,
             base,
             theme,

@@ -48,7 +48,7 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
   // the globe panel, so the sphere arrives upright and square to the viewer
   // just as it becomes something to handle, then leans off again for the work.
   desktop: [
-    { x: 0.9, y: 0, rotY: 0, rotX: Math.PI * -0.12, zoom: 1.8 },
+    { x: 0.9, y: 0, rotY: Math.PI * -0.13, rotX: Math.PI * 0.12, zoom: 1.65, opacity: 0.05, },
     {
       x: -1.4,
       y: 0,
@@ -63,11 +63,11 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
       rotY: Math.PI * 0.1,
       rotX: Math.PI * 0.5,
       zoom: 2.5,
-      opacity: 0.03,
+      opacity: 0.013,
     },
     // The globe panel. Centred, framed whole, and opaque enough to read as an
     // object rather than a texture — it is the subject here, not a backdrop.
-    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.8, opacity: 0.12 },
+    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.8, opacity: 0.52 },
     // Work panel. Pushed off behind the index column and faded nearly out —
     // this screen is dense, and the sphere is wallpaper again.
     {
@@ -76,7 +76,7 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
       rotY: Math.PI * 1.9,
       rotX: Math.PI * 0.16,
       zoom: 1.7,
-      opacity: 0.017,
+      opacity: 0.008,
     },
   ],
   // Behind the copy: drifts down the screen instead of across it, because a
@@ -94,7 +94,7 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
     },
     // Zoom stays at 1 so the whole globe fits the ~1.3 world units of width a
     // portrait viewport has; anything larger crops it at the sides.
-    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 1, opacity: 0.12 },
+    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 1, opacity: 0.5 },
     // Sunk below the content rather than beside it; a portrait viewport has no
     // room to the side of a panel this dense.
     {
@@ -141,6 +141,44 @@ export const SPHERE_OPACITY: Record<"light" | "dark", number> = {
   light: 0.07,
   dark: 0.1,
 };
+
+/**
+ * Land/ocean mask, used as the material's alphaMap so the sphere only draws
+ * over land. It is a mask rather than a colour map on purpose: alphaMap decides
+ * *where* the material draws and leaves the colour to SPHERE_COLOR, so the
+ * globe still inverts with the theme. As a colour map it could not — the
+ * material's colour multiplies the texture, and multiplying only ever darkens.
+ *
+ * Source texture by moryenn on CGTrader — see CREDITS.md, which is the copy
+ * that has to stay accurate. Derived from design/8k_earth_specular_map.tif,
+ * which stores ocean white and land black; the conversion inverts it so land
+ * is what survives:
+ *   ffmpeg -i <src>.tif -vf "scale=2048:1024,format=gray,negate" public/earth-mask.png
+ */
+export const SPHERE_MASK = "/earth-mask.png";
+
+/**
+ * The globe is two layers on one sphere: solid landmasses, and the wire
+ * lattice over them that gives the shape an outline. They have to be separate
+ * meshes because one material cannot be both filled and wireframe.
+ *
+ * Each layer's share of whatever opacity the current panel calls for. The land
+ * carries the globe; the wire is structure drawn on top and reads heavier than
+ * the land at matching values, so it runs lighter. Set `wire` to 0 for solid
+ * continents alone, or `land` to 0 for the bare lattice the site had before.
+ */
+export const SPHERE_LAYER_OPACITY = {
+  land: 1.9,
+  wire: 0.075,
+};
+
+/**
+ * The wire sphere's radius as a multiple of the land sphere's. The two are
+ * otherwise coplanar, and neither writes depth, so which one wins is left to
+ * draw order. Floating the wire just outside settles it: the lattice always
+ * reads as an outline over the fill rather than flickering through it.
+ */
+export const SPHERE_WIRE_OFFSET = 1.003;
 
 /**
  * The one panel whose markup opts into spinning the globe by hand. Every other
