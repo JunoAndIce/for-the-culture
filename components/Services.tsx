@@ -73,6 +73,12 @@ export default function Services() {
             identity, or launching a marketing campaign, we have the expertise
             to help you succeed.
           </p>
+          <p className="mt-5 max-w-2xl text-sm leading-relaxed font-bold text-foreground/70 md:mt-8 md:text-lg">
+            For the Culture is committed to helping you achieve your goals.
+            Whether you&apos;re building a new website, creating a brand
+            identity, or launching a marketing campaign, we have the expertise
+            to help you succeed.
+          </p>
 
           <Tabs
             defaultValue={FEATURES[0].title}

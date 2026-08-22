@@ -1,5 +1,7 @@
+import Globe from "@/components/Globe";
 import Home from "@/components/Home";
 import Navbar from "@/components/Navbar";
+import Projects from "@/components/Projects";
 import Scene from "@/components/Scene";
 import ScrollChevron from "@/components/ScrollChevron";
 import Services from "@/components/Services";
@@ -16,6 +18,8 @@ export default function Page() {
         <Home />
         <Services />
         <Testimonials />
+        <Globe />
+        <Projects />
       </main>
     </div>
   );
