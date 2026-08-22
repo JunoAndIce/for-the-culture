@@ -7,7 +7,7 @@ Third-party assets used on this site, and where they came from.
 **moryenn** — CGTrader
 
 - Product page: [Wireframe Earth](https://www.cgtrader.com/free-3d-models/interior/other/wireframe-earth)
-- Licence: _add the licence you acquired (CGTrader Royalty Free, Editorial, or Custom)_
+- Licence: CGTrader Royalty Free
 - Source file: `design/8k_earth_specular_map.tif` (8192×4096, land/ocean specular map)
 - Used as: `public/earth-mask.png` — downsampled to 2048×1024, converted to
   8-bit grayscale, and inverted so land is the visible side. Applied as the
@@ -22,10 +22,14 @@ ffmpeg -i design/8k_earth_specular_map.tif \
   public/earth-mask.png
 ```
 
-> **Two blanks above need filling before this ships.** The licence line
-> especially: CGTrader sells several, and they differ on whether commercial use
-> on a client-facing site is permitted and whether attribution is required at
-> all. Crediting someone does not by itself grant the right to use their work.
+> **One thing royalty-free does not cover: redistributing the asset itself.**
+> Marketplace licences let you *use* the work in a project; they do not let you
+> hand the source file on to others. Using `earth-mask.png` in the site is
+> squarely the intended use. But `design/8k_earth_specular_map.tif` is the
+> original file and is committed to this repo — if the repo is ever public,
+> that source is downloadable by anyone, which is closer to redistribution than
+> to use. Keep the repo private, or keep the source out of it. Worth confirming
+> against the licence text rather than taking this note's word for it.
 
 ## Fonts
 
