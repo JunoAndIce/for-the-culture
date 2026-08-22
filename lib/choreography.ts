@@ -48,63 +48,18 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
   // the globe panel, so the sphere arrives upright and square to the viewer
   // just as it becomes something to handle, then leans off again for the work.
   desktop: [
-    { x: 0.9, y: 0, rotY: Math.PI * -0.13, rotX: Math.PI * 0.12, zoom: 1.65, opacity: 0.05, },
-    {
-      x: -1.4,
-      y: 0,
-      rotY: Math.PI * 3.1,
-      rotX: Math.PI * 0.2,
-      zoom: 1.2,
-      opacity: 0.12,
-    },
-    {
-      x: 0,
-      y: -0.3,
-      rotY: Math.PI * 0.1,
-      rotX: Math.PI * 0.5,
-      zoom: 2.5,
-      opacity: 0.013,
-    },
-    // The globe panel. Centred, framed whole, and opaque enough to read as an
-    // object rather than a texture — it is the subject here, not a backdrop.
-    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.8, opacity: 0.52 },
-    // Work panel. Pushed off behind the index column and faded nearly out —
-    // this screen is dense, and the sphere is wallpaper again.
-    {
-      x: -1.7,
-      y: 0.25,
-      rotY: Math.PI * 1.9,
-      rotX: Math.PI * 0.16,
-      zoom: 1.7,
-      opacity: 0.008,
-    },
+    { x: 0.9, y: 0, rotY: Math.PI * -0.13, rotX: Math.PI * 0.12, zoom: 1.65, opacity: 0.3, },
+    { x: -1.4, y: 0, rotY: Math.PI * -0.5, rotX: Math.PI * -0.1, zoom: 1.2, opacity: 0.5, },
+    { x: 0, y: -0.3, rotY: Math.PI * 0.1, rotX: Math.PI * 0.5, zoom: 2.5, opacity: 0.1,},
+    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.8, opacity: 1 },
+    { x: -1.7, y: 0.25, rotY: Math.PI * 1.9, rotX: Math.PI * 0.16, zoom: 1.7, opacity: 0.05,},
   ],
-  // Behind the copy: drifts down the screen instead of across it, because a
-  // portrait viewport has no horizontal room to move through.
   mobile: [
     { x: 0, y: 0.75, rotY: 0, rotX: Math.PI * 0.12, zoom: 1.35 },
-    { x: 0, y: 0, rotY: Math.PI * 0.6, rotX: Math.PI * 0.18, opacity: 0.02 },
-    {
-      x: 0,
-      y: -0.9,
-      rotY: Math.PI * 1.1,
-      rotX: Math.PI * 0.1,
-      zoom: 1.6,
-      opacity: 0.06,
-    },
-    // Zoom stays at 1 so the whole globe fits the ~1.3 world units of width a
-    // portrait viewport has; anything larger crops it at the sides.
-    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 1, opacity: 0.5 },
-    // Sunk below the content rather than beside it; a portrait viewport has no
-    // room to the side of a panel this dense.
-    {
-      x: 0,
-      y: -1.1,
-      rotY: Math.PI * 1.9,
-      rotX: Math.PI * 0.16,
-      zoom: 1.5,
-      opacity: 0.04,
-    },
+    { x: 0, y: 0, rotY: Math.PI * 0.6, rotX: Math.PI * 0.18, opacity: 0.1 },
+    { x: 0, y: -0.9, rotY: Math.PI * 1.1, rotX: Math.PI * 0.1, zoom: 1.6, opacity: 0.06, },
+    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 1, opacity: 1 },
+    { x: 0, y: 1.1, rotY: Math.PI * 2, rotX: Math.PI * 0.3, zoom: 1.5, opacity: 0.04, },
   ],
 };
 
@@ -143,19 +98,33 @@ export const SPHERE_OPACITY: Record<"light" | "dark", number> = {
 };
 
 /**
- * Land/ocean mask, used as the material's alphaMap so the sphere only draws
- * over land. It is a mask rather than a colour map on purpose: alphaMap decides
- * *where* the material draws and leaves the colour to SPHERE_COLOR, so the
- * globe still inverts with the theme. As a colour map it could not — the
- * material's colour multiplies the texture, and multiplying only ever darkens.
+ * Land/ocean mask, used as the material's alphaMap
+ * As a colour map it could not — the material's colour multiplies the texture, and multiplying only ever darkens.
  *
  * Source texture by moryenn on CGTrader — see CREDITS.md, which is the copy
- * that has to stay accurate. Derived from design/8k_earth_specular_map.tif,
- * which stores ocean white and land black; the conversion inverts it so land
- * is what survives:
- *   ffmpeg -i <src>.tif -vf "scale=2048:1024,format=gray,negate" public/earth-mask.png
+ * that has to stay accurate.
+ *   
+ * ffmpeg -i <src>.tif -vf "scale=WxH,format=gray,negate" public/earth-mask-Nk.png
+ *
+ * Both sizes here are roughly double what that measurement asks for — desktop
+ * draws the globe ~1235px across and wants ~3900, mobile ~664px and wants
+ * ~2090. The headroom is deliberate, chosen on how it looked: it costs 170MB of
+ * VRAM on desktop and 43MB on mobile, against 43MB and 11MB at the measured
+ * sizes. earth-mask-2k.png is still in public/ if mobile turns out too heavy.
  */
-export const SPHERE_MASK = "/earth-mask.png";
+export const SPHERE_MASK: Record<Layout, string> = {
+  desktop: "/earth-mask-8k.png",
+  mobile: "/earth-mask-4k.png",
+};
+
+/**
+ * The one place the mask URL is decided. Both the preload in Scene and the load
+ * in WireframeSphere go through it — if they picked separately and disagreed,
+ * the page would quietly fetch two masks and show the slower one.
+ */
+export function maskUrlFor(width: number) {
+  return width >= BREAKPOINT_MD ? SPHERE_MASK.desktop : SPHERE_MASK.mobile;
+}
 
 /**
  * The globe is two layers on one sphere: solid landmasses, and the wire
@@ -168,8 +137,8 @@ export const SPHERE_MASK = "/earth-mask.png";
  * continents alone, or `land` to 0 for the bare lattice the site had before.
  */
 export const SPHERE_LAYER_OPACITY = {
-  land: 1.9,
-  wire: 0.075,
+  land: 2,
+  wire: 0.05,
 };
 
 /**

@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import WireframeSphere from "./WireframeSphere";
-import { SPHERE_MASK } from "@/lib/choreography";
+import { maskUrlFor } from "@/lib/choreography";
 
 // Starts the mask fetch as soon as this module evaluates, rather than waiting
 // for the sphere to mount and suspend. The sphere is the first thing on the
@@ -15,13 +15,18 @@ import { SPHERE_MASK } from "@/lib/choreography";
 // a promise executor and caches the result through suspend-react, which turns
 // that throw into a cached rejected promise rather than a visible crash — the
 // build passes and the failure hides. Never call it where document is absent.
+//
+// Must resolve the URL exactly as WireframeSphere does, hence the shared
+// helper: preloading one mask while the sphere asks for another would fetch
+// both and wait on the slower one.
 if (typeof document !== "undefined") {
-  useTexture.preload(SPHERE_MASK);
+  useTexture.preload(maskUrlFor(window.innerWidth));
 }
 
 export default function Scene() {
   return (
-    <div className="fixed inset-0 z-0">
+    // z-1, not z-0: the Backdrop holds z-0, and the globe draws over it.
+    <div className="fixed inset-0 z-1">
       <Canvas
         camera={{ position: [0, 0, 3], fov: 50 }}
         // Phones often report DPR 3+; uncapped that means ~9x the pixels.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import { useTheme } from "next-themes";
@@ -9,9 +9,9 @@ import type { Group, MeshBasicMaterial } from "three";
 import {
   BREAKPOINT_MD,
   SPHERE_COLOR,
-  SPHERE_MASK,
   SPHERE_SEGMENTS,
   SPHERE_WIRE_OFFSET,
+  maskUrlFor,
   type Layout,
 } from "@/lib/choreography";
 import { useGlobeDrag } from "@/lib/useGlobeDrag";
@@ -41,8 +41,16 @@ export default function WireframeSphere() {
   // decoding it as sRGB would bend the mask values on the way in. Anisotropy
   // matters here: near the sphere's edge the texture is sampled at a hard
   // angle, which is exactly where coastlines would otherwise smear.
+  //
+  // Resolved once, at mount, rather than from the reactive canvas width above:
+  // a URL that tracked the breakpoint would suspend and refetch the texture
+  // every time someone dragged the window across it. Measured on
+  // window.innerWidth to match the preload in Scene exactly.
   const gl = useThree((state) => state.gl);
-  const mask = useTexture(SPHERE_MASK, (loaded) => {
+  const [maskUrl] = useState(() =>
+    maskUrlFor(typeof window === "undefined" ? BREAKPOINT_MD : window.innerWidth),
+  );
+  const mask = useTexture(maskUrl, (loaded) => {
     const texture = Array.isArray(loaded) ? loaded[0] : loaded;
     texture.colorSpace = NoColorSpace;
     texture.anisotropy = gl.capabilities.getMaxAnisotropy();

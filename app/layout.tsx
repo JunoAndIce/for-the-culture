@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Gelasio, Geist, Geist_Mono, Inter, Italianno } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -34,6 +35,19 @@ const italianno = Italianno({
   weight: "400",
 });
 
+// Self-hosted rather than from Google. Named *-script for the same reason as
+// inter and gelasio above: the Tailwind theme key `--font-autograf` cannot
+// reference a variable of its own name. See globals.css.
+//
+// LICENCE: the file is Autograf_PersonalUseOnly.ttf. Personal use only does not
+// cover a commercial agency site — a licence has to be bought before this
+// ships. See CREDITS.md.
+const autograf = localFont({
+  src: "../fonts/Autograf_PersonalUseOnly.ttf",
+  variable: "--font-autograf-script",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "For the Culture",
   description: "For the Culture is a full-service creative agency specializing in web design, branding, and digital marketing. We help businesses and individuals bring their ideas to life through innovative design and strategic marketing solutions.",
@@ -50,7 +64,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${gelasio.variable} ${italianno.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${gelasio.variable} ${italianno.variable} ${autograf.variable}`}
     >
       <body className="antialiased">
         <ThemeProvider
