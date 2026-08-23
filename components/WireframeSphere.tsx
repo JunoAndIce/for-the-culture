@@ -59,7 +59,7 @@ export default function WireframeSphere() {
     texture.anisotropy = gl.capabilities.getMaxAnisotropy();
   });
 
-  useSphereScroll({ frame, spin, land, wire, glow, glowTilt }, theme);
+  useSphereScroll({ frame, spin, land, wire, glow, glowTilt });
   useGlobeDrag(globe);
 
   const segments = [1, widthSegments, heightSegments] as const;

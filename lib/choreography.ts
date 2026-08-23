@@ -24,11 +24,8 @@ export type SphereState = {
   rotY: number;
   rotX?: number;
   zoom?: number;
-  /**
-   * Wireframe opacity for this panel. Absolute, not a multiplier.
-   * Omit to use SPHERE_OPACITY for the active theme.
-   */
-  opacity?: number;
+  /** Wireframe opacity for this panel. Absolute, not a multiplier. */
+  opacity: number;
   glow?: number;
   ring?: RingState;
 };
@@ -58,9 +55,9 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
   mobile: [
     { x: 0, y: 0.75, rotY: 0, rotX: Math.PI * 0.12, zoom: 0.95, opacity: 0.2, glow: 1, ring: { tilt: 2.2, radius: 1.5 } },
     { x: 0, y: 0, rotY: Math.PI * 0.6, rotX: Math.PI * 0.18, zoom: 0.75, opacity: 0.08, glow: 1, ring: { tilt: 1.85, radius: 1.45 } },
-    { x: 0, y: -0.9, rotY: Math.PI * 1.1, rotX: Math.PI * 0.1, zoom: 1.6, opacity: 0.06, glow: 1, ring: { tilt: 0.95, radius: 1.45 } },
-    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.75, opacity: 1, glow: 1 },
-    { x: 0, y: 1.1, rotY: Math.PI * 2, rotX: Math.PI * 0.3, zoom: 1.5, opacity: 0.04, glow: 1, ring: { tilt: 1.57, radius: 1.45 } },
+    { x: 0, y: -0.9, rotY: Math.PI * 1.1, rotX: Math.PI * 0.1, zoom: 1.6, opacity: 0.06, glow: 1, ring: { tilt: 1.05, radius: 1.45 } },
+    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.85, opacity: 1, glow: 1 },
+    { x: 0, y: 0.02, rotY: Math.PI * 2, rotX: Math.PI * 0.3, zoom: 1.1, opacity: 0.04, glow: 1, ring: { tilt: 1.17, radius: 1.45 } },
   ],
 };
 
@@ -86,16 +83,6 @@ export const SPHERE_SEGMENTS: Record<Layout, [number, number]> = {
 export const SPHERE_COLOR: Record<"light" | "dark", string> = {
   light: "#000000",
   dark: "#ffffff",
-};
-
-/**
- * Base wireframe opacity per theme, used when a panel does not set its own.
- * Dark lines on a light background read heavier than the reverse at the same
- * value, so light runs lower.
- */
-export const SPHERE_OPACITY: Record<"light" | "dark", number> = {
-  light: 0.07,
-  dark: 0.1,
 };
 
 export const SPHERE_MASK: Record<Layout, string> = {

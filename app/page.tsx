@@ -1,4 +1,5 @@
 import Globe from "@/components/Globe";
+import Loader from "@/components/Loader";
 import Home from "@/components/Home";
 import Navbar from "@/components/Navbar";
 import Projects from "@/components/Projects";
@@ -10,6 +11,7 @@ import Testimonials from "@/components/Testimonials";
 export default function Page() {
   return (
     <div className="relative bg-background">
+      <Loader />
       <Scene />
       <Navbar />
       <ScrollChevron />

@@ -2,20 +2,17 @@
 
 import type { RefObject } from "react";
 import type { Material, Object3D, ShaderMaterial } from "three";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import {
   BREAKPOINT_MD,
   GLOBE_GLOW,
   PANEL_SELECTOR,
   SPHERE_LAYER_OPACITY,
-  SPHERE_OPACITY,
   SPHERE_PATH,
   SPHERE_SCALE,
   type Layout,
   type SphereState,
 } from "@/lib/choreography";
-
-export type SphereTheme = "light" | "dark";
 
 /**
  * The parts of the sphere this hook drives. They are separate nodes because
@@ -44,12 +41,11 @@ type Resolved = {
 /** A panel's zoom is a multiplier on the layout's base scale. */
 const scaleFor = (state: SphereState, base: number) => base * (state.zoom ?? 1);
 
-/** Absolute per panel, falling back to the theme's base; each layer takes a share. */
+/** A panel's opacity is absolute; each layer then takes its own share of it. */
 const opacityFor = (
   state: SphereState,
-  theme: SphereTheme,
   layer: keyof typeof SPHERE_LAYER_OPACITY,
-) => (state.opacity ?? SPHERE_OPACITY[theme]) * SPHERE_LAYER_OPACITY[layer];
+) => state.opacity * SPHERE_LAYER_OPACITY[layer];
 
 /** A panel's tilt is optional; upright is the default. */
 const tiltFor = (state: SphereState) => state.rotX ?? 0;
@@ -73,7 +69,6 @@ function poseFor(
   n: Resolved,
   state: SphereState,
   base: number,
-  theme: SphereTheme,
 ): [object, Record<string, number>][] {
   const scale = scaleFor(state, base);
   const ring = ringFor(state);
@@ -82,8 +77,8 @@ function poseFor(
     [n.frame.position, { x: state.x, y: state.y }],
     [n.frame.scale, { x: scale, y: scale, z: scale }],
     [n.spin.rotation, { x: tiltFor(state), y: state.rotY }],
-    [n.land, { opacity: opacityFor(state, theme, "land") }],
-    [n.wire, { opacity: opacityFor(state, theme, "wire") }],
+    [n.land, { opacity: opacityFor(state, "land") }],
+    [n.wire, { opacity: opacityFor(state, "wire") }],
     [n.glowTilt.rotation, { x: ring.tilt }],
     [u.uOpacity, { value: glowFor(state) }],
     [u.uRing, { value: ring.radius }],
@@ -103,7 +98,6 @@ function buildTimeline(
   n: Resolved,
   path: SphereState[],
   base: number,
-  theme: SphereTheme,
   reduceMotion: boolean,
 ) {
   const panels = gsap.utils.toArray<HTMLElement>(PANEL_SELECTOR);
@@ -122,19 +116,8 @@ function buildTimeline(
       start: "top top",
       endTrigger: panels[panels.length - 1],
       end: "top top",
-      // Reduced motion: locked to the scrollbar, and no snap — moving the page
-      // on the reader's behalf is exactly what they asked not to happen.
+      // Reduced motion: stay locked to the scrollbar rather than easing toward it.
       scrub: reduceMotion ? true : 1,
-      snap: reduceMotion
-        ? undefined
-        : {
-            // Real panel tops, not an even increment, so a panel taller than the
-            // viewport still lands square.
-            snapTo: tops.map((top) => (top - tops[0]) / span),
-            duration: { min: 0.5, max: 1.9 },
-            delay: 0.2,
-            ease: "power2.inOut",
-          },
     },
   });
 
@@ -144,10 +127,47 @@ function buildTimeline(
     // Each segment lasts the real scroll distance between its two panels, so
     // adding a panel extends the timeline instead of retiming earlier ones.
     const duration = (tops[i + 1] - tops[i]) / span;
-    poseFor(n, state, base, theme).forEach(([target, vars], k) => {
+    poseFor(n, state, base).forEach(([target, vars], k) => {
       tl.to(target, { ...vars, duration }, k > 0 ? "<" : i === 0 ? 0 : ">");
     });
   });
+}
+
+/**
+ * Panel snapping, deliberately on its own ScrollTrigger with no dependencies:
+ * on the sphere's it was rebuilt on every theme change, which re-fired the snap.
+ */
+function usePanelSnap() {
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+    // No snap under reduced motion; moving the page unasked is the whole point.
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      const panels = gsap.utils.toArray<HTMLElement>(PANEL_SELECTOR);
+      if (panels.length < 2) return;
+      const tops = panels.map((el) => el.offsetTop);
+      const span = tops[tops.length - 1] - tops[0];
+      if (span <= 0) return;
+
+      ScrollTrigger.create({
+        trigger: panels[0],
+        start: "top top",
+        markers: false,
+        endTrigger: panels[panels.length - 1],
+        end: "top top",
+        snap: {
+          // Real panel tops, not an even increment, so a panel taller than the
+          // viewport still lands square.
+          snapTo: tops.map((top) => (top - tops[0]) / span),
+          duration: { min: 0.5, max: 1.9 },
+          delay: 0.2,
+          ease: "power2.inOut",
+          // Nearest stop, not the one you were heading for: a stray pixel of
+          // scroll should never carry the reader to the next panel.
+          directional: true,
+        },
+      });
+    });
+  }, []);
 }
 
 /**
@@ -165,9 +185,13 @@ function buildTimeline(
  * Position and scale stay above everything, so no rotation can turn the
  * sphere's offset into an orbit around the origin.
  *
- * Rebuilds when the theme changes, because opacity is theme-dependent.
+ * Built once. Nothing here depends on the theme — the material colour is a
+ * React prop — and rebuilding on a toggle was jolting the reader to another
+ * panel.
  */
-export function useSphereScroll(nodes: SphereNodes, theme: SphereTheme) {
+export function useSphereScroll(nodes: SphereNodes) {
+  usePanelSnap();
+
   useGSAP(
     () => {
       const frame = nodes.frame.current;
@@ -198,14 +222,14 @@ export function useSphereScroll(nodes: SphereNodes, theme: SphereTheme) {
           const base = SPHERE_SCALE[layout];
 
           // Establish the layout's starting pose before the triggers capture it.
-          poseFor(n, path[0], base, theme).forEach(([target, vars]) =>
+          poseFor(n, path[0], base).forEach(([target, vars]) =>
             gsap.set(target, vars),
           );
 
-          buildTimeline(n, path, base, theme, reduceMotion);
+          buildTimeline(n, path, base, reduceMotion);
         },
       );
     },
-    { dependencies: [theme], revertOnUpdate: true },
+    { dependencies: [] },
   );
 }
