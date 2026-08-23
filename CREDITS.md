@@ -14,14 +14,13 @@ Third-party assets used on this site, and where they came from.
 
 ## Fonts
 
-**Autograf** — used for the script line on the services panel.
+**Cochocib Script** — used for the script line on the services panel.
 
-- Source file: `fonts/Autograf_PersonalUseOnly.ttf`
-- Licence: **personal use only, as the filename states.** This site is
-  commercial work for an agency, which that licence does not cover. A
-  commercial licence has to be bought from the foundry, or the face swapped,
-  before this ships. Nothing else in the build depends on it — it is one
-  `localFont` call in `app/layout.tsx` and the `font-autograf` class.
+- Source file: `fonts/Cochocib Script Free.otf`
+- Licence: **unconfirmed.** "Free" in a script face's filename usually means
+  free for personal use, not commercial. Check the foundry's terms before this
+  ships. Nothing else in the build depends on it — one `localFont` call in
+  `app/layout.tsx` and the `font-cochocib` class.
 
 Geist, Geist Mono, Inter, Gelasio, and Italianno, all served through
 `next/font/google`. Open source under the SIL Open Font License.

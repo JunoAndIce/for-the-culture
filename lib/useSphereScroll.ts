@@ -104,7 +104,7 @@ function buildTimeline(
   path: SphereState[],
   base: number,
   theme: SphereTheme,
-  scrub: number | boolean,
+  reduceMotion: boolean,
 ) {
   const panels = gsap.utils.toArray<HTMLElement>(PANEL_SELECTOR);
   if (panels.length < 2) return;
@@ -122,7 +122,19 @@ function buildTimeline(
       start: "top top",
       endTrigger: panels[panels.length - 1],
       end: "top top",
-      scrub,
+      // Reduced motion: locked to the scrollbar, and no snap — moving the page
+      // on the reader's behalf is exactly what they asked not to happen.
+      scrub: reduceMotion ? true : 1,
+      snap: reduceMotion
+        ? undefined
+        : {
+            // Real panel tops, not an even increment, so a panel taller than the
+            // viewport still lands square.
+            snapTo: tops.map((top) => (top - tops[0]) / span),
+            duration: { min: 0.5, max: 1.9 },
+            delay: 0.2,
+            ease: "power2.inOut",
+          },
     },
   });
 
@@ -190,8 +202,7 @@ export function useSphereScroll(nodes: SphereNodes, theme: SphereTheme) {
             gsap.set(target, vars),
           );
 
-          // Reduced motion: stay locked to the scrollbar rather than easing toward it.
-          buildTimeline(n, path, base, theme, reduceMotion ? true : 1);
+          buildTimeline(n, path, base, theme, reduceMotion);
         },
       );
     },

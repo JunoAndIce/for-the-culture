@@ -52,15 +52,15 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
     { x: 0.9, y: 0, rotY: Math.PI * -0.13, rotX: Math.PI * 0.12, zoom: 1.65, opacity: 0.3, glow: 1, ring: { tilt: 1.1, radius: 1.5 } },
     { x: -1.4, y: 0, rotY: Math.PI * -0.5, rotX: Math.PI * -0.1, zoom: 1.2, opacity: 0.5, glow: 1, ring: { tilt: 1.65, radius: 1.45 } },
     { x: 0, y: -0.3, rotY: Math.PI * 0.1, rotX: Math.PI * 0.5, zoom: 2.5, opacity: 0.1,},
-    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.8, opacity: 1, glow: 1, ring: {spread: 0.1, floor: 1.1} },
+    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.8, opacity: 1, glow: 1, ring: {spread: 0.1, floor: 1.06} },
     { x: -1.7, y: 0.25, rotY: Math.PI * 1.9, rotX: Math.PI * 0.16, zoom: 1.7, opacity: 0.05, glow: 1, ring: { tilt: 1.57, radius: 1.45 }},
   ],
   mobile: [
-    { x: 0, y: 0.75, rotY: 0, rotX: Math.PI * 0.12, zoom: 1.35 },
-    { x: 0, y: 0, rotY: Math.PI * 0.6, rotX: Math.PI * 0.18, opacity: 0.1 },
-    { x: 0, y: -0.9, rotY: Math.PI * 1.1, rotX: Math.PI * 0.1, zoom: 1.6, opacity: 0.06, },
-    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 1, opacity: 1, glow: 1 },
-    { x: 0, y: 1.1, rotY: Math.PI * 2, rotX: Math.PI * 0.3, zoom: 1.5, opacity: 0.04, },
+    { x: 0, y: 0.75, rotY: 0, rotX: Math.PI * 0.12, zoom: 0.95, opacity: 0.2, glow: 1, ring: { tilt: 2.2, radius: 1.5 } },
+    { x: 0, y: 0, rotY: Math.PI * 0.6, rotX: Math.PI * 0.18, zoom: 0.75, opacity: 0.08, glow: 1, ring: { tilt: 1.85, radius: 1.45 } },
+    { x: 0, y: -0.9, rotY: Math.PI * 1.1, rotX: Math.PI * 0.1, zoom: 1.6, opacity: 0.06, glow: 1, ring: { tilt: 0.95, radius: 1.45 } },
+    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.75, opacity: 1, glow: 1 },
+    { x: 0, y: 1.1, rotY: Math.PI * 2, rotX: Math.PI * 0.3, zoom: 1.5, opacity: 0.04, glow: 1, ring: { tilt: 1.57, radius: 1.45 } },
   ],
 };
 
@@ -119,7 +119,7 @@ export function maskUrlFor(width: number) {
  */
 export const SPHERE_LAYER_OPACITY = {
   land: 2,
-  wire: 0.05,
+  wire: 0.09,
 };
 
 export const SPHERE_WIRE_OFFSET = 1.003;
@@ -130,7 +130,7 @@ export const GLOBE_GLOW = {
   /** Ring radius in globe radii. 1 is exactly the silhouette. */
   ring: 1.18,
   /** Gaussian spread across the radius. Bigger is hazier. */
-  spread: 0.02,
+  spread: 0.07,
   /** Gaussian depth through the screen, in globe radii. */
   thickness: 0.07,
   /** Hard inner limit, keeping the Gaussian's tail off the globe's face. */

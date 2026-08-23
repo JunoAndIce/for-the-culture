@@ -38,6 +38,13 @@ export default function Navbar() {
         ))}
       </ul>
 
+      {/* Scrim behind the open menu. First in DOM order so the burger and the
+          list paint over it without either needing a z-index. */}
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none fixed inset-y-0 left-0 w-4/5 bg-linear-to-r from-background from-25% via-background/75 to-transparent transition-opacity duration-300 motion-reduce:transition-none md:hidden ${open ? "opacity-100" : "opacity-0"}`}
+      />
+
       {/* Mobile: burger in the top-left. */}
       <button
         type="button"
@@ -45,7 +52,7 @@ export default function Navbar() {
         aria-label={open ? "Close menu" : "Open menu"}
         aria-expanded={open}
         aria-controls="mobile-menu"
-        className="-m-2 block p-2 md:hidden"
+        className="relative -m-2 block p-2 md:hidden"
       >
         <svg
           className={`ham hamRotate ham8 text-foreground${open ? " active" : ""}`}
@@ -66,7 +73,7 @@ export default function Navbar() {
 
       <ul
         id="mobile-menu"
-        className={`${open ? "flex" : "hidden"} mt-4 flex-col gap-4 text-sm tracking-widest uppercase md:hidden`}
+        className={`${open ? "flex" : "hidden"} relative mt-4 flex-col gap-4 text-sm tracking-widest uppercase md:hidden`}
       >
         {NAV_ITEMS.map((item) => (
           <li key={item}>

@@ -83,7 +83,7 @@ export default function Services() {
            * script face throws descenders and swashes well past a tight line
            * box — without the padding their tails come out unpainted.
            */}
-          <ScriptReveal className="bg-linear-to-r from-[#AF2F34] via-[#A57100] to-[#1F7C44] bg-clip-text pt-[0.06em] pb-[0.22em] font-autograf text-[clamp(3rem,7vw,5.5rem)] leading-[0.95] text-transparent dark:from-[#D75555] dark:via-[#F4BC48] dark:to-[#4AA167]">
+          <ScriptReveal className="bg-linear-to-r from-[#AF2F34] via-[#A57100] to-[#1F7C44] bg-clip-text pt-[0.06em] pb-[0.22em] font-cochocib text-[clamp(3rem,7vw,5.5rem)] leading-[0.95] text-transparent dark:from-[#D75555] dark:via-[#F4BC48] dark:to-[#4AA167]">
             For the Culture
           </ScriptReveal>
 
