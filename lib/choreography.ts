@@ -8,35 +8,29 @@
  * animates to as that panel scrolls into view.
  */
 
+/** Per-panel ring overrides. Every field is tweened between panels. */
+export type RingState = {
+  tilt?: number;
+  radius?: number;
+  spread?: number;
+  floor?: number;
+  thickness?: number;
+  size?: number;
+};
+
 export type SphereState = {
-  /** World-space X. Positive is right. */
   x: number;
-  /** World-space Y. Positive is up. */
   y: number;
-  /** Y-axis rotation in radians. */
   rotY: number;
-  /**
-   * Axial tilt in radians, applied outside rotY the way Earth's is: the sphere
-   * spins about an axis that has been tipped, rather than tumbling end over
-   * end. Positive tips the north pole toward the viewer. Omit for upright.
-   */
   rotX?: number;
-  /**
-   * Zoom for this panel, multiplied onto the layout's base scale.
-   * 1 (default) = normal, >1 = closer, <1 = further away.
-   */
   zoom?: number;
   /**
    * Wireframe opacity for this panel. Absolute, not a multiplier.
    * Omit to use SPHERE_OPACITY for the active theme.
    */
   opacity?: number;
-  /**
-   * Strength of the tri-colour halo on this panel, 0 to 1, scaled by
-   * GLOBE_GLOW.intensity. Omit for no glow — which is every panel but the one
-   * where the globe is yours to spin.
-   */
   glow?: number;
+  ring?: RingState;
 };
 
 export type Layout = "desktop" | "mobile";
@@ -55,11 +49,11 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
   // just as it becomes something to handle, then leans off again for the work.
   // That panel is also the only one that lights the halo — see `glow`.
   desktop: [
-    { x: 0.9, y: 0, rotY: Math.PI * -0.13, rotX: Math.PI * 0.12, zoom: 1.65, opacity: 0.3, glow: 1 },
-    { x: -1.4, y: 0, rotY: Math.PI * -0.5, rotX: Math.PI * -0.1, zoom: 1.2, opacity: 0.5, glow: 1 },
+    { x: 0.9, y: 0, rotY: Math.PI * -0.13, rotX: Math.PI * 0.12, zoom: 1.65, opacity: 0.3, glow: 1, ring: { tilt: 1.1, radius: 1.5 } },
+    { x: -1.4, y: 0, rotY: Math.PI * -0.5, rotX: Math.PI * -0.1, zoom: 1.2, opacity: 0.5, glow: 1, ring: { tilt: 1.65, radius: 1.45 } },
     { x: 0, y: -0.3, rotY: Math.PI * 0.1, rotX: Math.PI * 0.5, zoom: 2.5, opacity: 0.1,},
-    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.8, opacity: 1, glow: 1 },
-    { x: -1.7, y: 0.25, rotY: Math.PI * 1.9, rotX: Math.PI * 0.16, zoom: 1.7, opacity: 0.05,},
+    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.8, opacity: 1, glow: 1, ring: {spread: 0.1, floor: 1.1} },
+    { x: -1.7, y: 0.25, rotY: Math.PI * 1.9, rotX: Math.PI * 0.16, zoom: 1.7, opacity: 0.05, glow: 1, ring: { tilt: 1.57, radius: 1.45 }},
   ],
   mobile: [
     { x: 0, y: 0.75, rotY: 0, rotX: Math.PI * 0.12, zoom: 1.35 },
@@ -104,31 +98,11 @@ export const SPHERE_OPACITY: Record<"light" | "dark", number> = {
   dark: 0.1,
 };
 
-/**
- * Land/ocean mask, used as the material's alphaMap
- * As a colour map it could not — the material's colour multiplies the texture, and multiplying only ever darkens.
- *
- * Source texture by moryenn on CGTrader — see CREDITS.md, which is the copy
- * that has to stay accurate.
- *   
- * ffmpeg -i <src>.tif -vf "scale=WxH,format=gray,negate" public/earth-mask-Nk.png
- *
- * Both sizes here are roughly double what that measurement asks for — desktop
- * draws the globe ~1235px across and wants ~3900, mobile ~664px and wants
- * ~2090. The headroom is deliberate, chosen on how it looked: it costs 170MB of
- * VRAM on desktop and 43MB on mobile, against 43MB and 11MB at the measured
- * sizes. design/earth-mask-2k.png is a spare if mobile turns out too heavy.
- */
 export const SPHERE_MASK: Record<Layout, string> = {
   desktop: "/earth-mask-8k.png",
   mobile: "/earth-mask-4k.png",
 };
 
-/**
- * The one place the mask URL is decided. Both the preload in Scene and the load
- * in WireframeSphere go through it — if they picked separately and disagreed,
- * the page would quietly fetch two masks and show the slower one.
- */
 export function maskUrlFor(width: number) {
   return width >= BREAKPOINT_MD ? SPHERE_MASK.desktop : SPHERE_MASK.mobile;
 }
@@ -151,37 +125,29 @@ export const SPHERE_LAYER_OPACITY = {
 export const SPHERE_WIRE_OFFSET = 1.003;
 
 export const GLOBE_GLOW = {
-  /** How many motes. Cheap — these are single points, not geometry. */
+  /** How many motes. Baked at mount, so this one cannot be per-panel. */
   count: 14000,
-  /** Radius of the ring, in globe radii. 1 is exactly the silhouette. */
-  ring: 1.3,
-  /** Gaussian spread of the ring across its radius. Bigger is hazier. */
-  spread: 0.1,
-  /** Gaussian depth through the screen, in globe radii. Gives the ring body. */
+  /** Ring radius in globe radii. 1 is exactly the silhouette. */
+  ring: 1.18,
+  /** Gaussian spread across the radius. Bigger is hazier. */
+  spread: 0.02,
+  /** Gaussian depth through the screen, in globe radii. */
   thickness: 0.07,
-  floor: 1.08,
+  /** Hard inner limit, keeping the Gaussian's tail off the globe's face. */
+  floor: 1.09,
+  /** Lean in radians. 0 is face-on; ~1.15 reads as Saturn, past 1.4 is a line. */
   tilt: 0,
+  /** Mote size in CSS pixels. */
   size: 1.5,
-  /**
-   * How steeply brightness is weighted toward the dim end. 1 is even; higher
-   * leaves most motes faint and a few bright, which is what stops a point
-   * cloud looking like uniform static. Past about 3 the colour stops reading.
-   */
+  /** Brightness weighting toward the dim end. Baked, so not per-panel. */
   contrast: 1.7,
   /** Ceiling on brightness, before a panel's own `glow` scales it down. */
-  intensity: 1.6,
-  /** Radians per second the ring turns in its own plane. 0 holds it still. */
-  drift: 0.05,
-  /**
-   * Bearing of the colour sweep, in radians. 0 runs left to right — the same
-   * direction as the script line on the services panel.
-   */
+  intensity: 2,
+  /** Radians per second the ring turns in its own plane. */
+  drift: 0.03,
+  /** Bearing of the colour sweep, in radians. 0 runs left to right. */
   angle: 0,
-  /**
-   * Red, gold, green. Ordered to match the services gradient rather than the
-   * order they were asked for, so the two read as one palette; swap the
-   * entries to re-run the sweep.
-   */
+  /** Red, gold, green — the services gradient's palette and order. */
   colors: ["#E0413A", "#F4BC48", "#2FA05E"],
 } as const;
 
@@ -195,16 +161,6 @@ export const GLOBE_STAGE_SELECTOR = "[data-globe-stage]";
 /** Radians of spin per pixel dragged. */
 export const GLOBE_DRAG_SENSITIVITY = 0.006;
 
-/**
- * How far a vertical drag can tip the globe off its axis, in radians — the
- * knob for how much up-and-down travel the user gets. Stopping short of a right
- * angle keeps a pole from swinging through the centre of the frame, and gives
- * the gesture a floor and a ceiling, which matters because the globe stage
- * takes vertical swipes away from the page scroll.
- *
- * 0.5 would put the pole dead centre at the extreme; below about 0.2 the drag
- * stops feeling like it does anything.
- */
 export const GLOBE_TILT_LIMIT = Math.PI * 0.4;
 
 /** Fraction of the fling's speed that survives each second after release. */

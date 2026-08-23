@@ -28,6 +28,7 @@ export default function WireframeSphere() {
   const land = useRef<MeshBasicMaterial>(null);
   const wire = useRef<MeshBasicMaterial>(null);
   const glow = useRef<ShaderMaterial>(null);
+  const glowTilt = useRef<Group>(null);
 
   // Canvas size, not window — updates on resize without touching `window`.
   const width = useThree((state) => state.size.width);
@@ -58,20 +59,24 @@ export default function WireframeSphere() {
     texture.anisotropy = gl.capabilities.getMaxAnisotropy();
   });
 
-  useSphereScroll({ frame, spin, land, wire, glow }, theme);
+  useSphereScroll({ frame, spin, land, wire, glow, glowTilt }, theme);
   useGlobeDrag(globe);
 
   const segments = [1, widthSegments, heightSegments] as const;
 
   return (
     <group ref={frame}>
-      {/*
-       * Inside frame so the halo travels and scales with the globe, but
-       * outside the drag and spin nodes below, so it neither turns with the
-       * scroll nor swings around when the sphere is dragged. A gradient that
-       * rode the spin would smear; this one stays lit from one side.
-       */}
-      <GlobeGlow materialRef={glow} />
+      {/* Depth-only stand-in for the planet: writes depth, paints nothing, so the
+          ring's far half is cut by the globe's silhouette. 0.99 keeps it behind
+          the land (1) and the wire (SPHERE_WIRE_OFFSET), which are FrontSide. */}
+      <mesh renderOrder={-10}>
+        <sphereGeometry args={[0.99, 32, 16]} />
+        <meshBasicMaterial colorWrite={false} />
+      </mesh>
+
+      {/* Inside frame so it travels and scales with the globe, but above the drag
+          and spin nodes, so the baked colour sweep never turns with it. */}
+      <GlobeGlow materialRef={glow} tiltRef={glowTilt} />
 
       <group ref={globe}>
         {/*
