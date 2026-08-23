@@ -1,10 +1,11 @@
 "use client";
 
 import type { RefObject } from "react";
-import type { Material, Object3D } from "three";
+import type { Material, Object3D, ShaderMaterial } from "three";
 import { gsap, useGSAP } from "@/lib/gsap";
 import {
   BREAKPOINT_MD,
+  GLOBE_GLOW,
   PANEL_SELECTOR,
   SPHERE_LAYER_OPACITY,
   SPHERE_OPACITY,
@@ -29,6 +30,11 @@ export type SphereNodes = {
   land: RefObject<Material | null>;
   /** The wire lattice over the land. Fades with it, at its own share. */
   wire: RefObject<Material | null>;
+  /**
+   * The halo shell. Sits under the drag node rather than inside it, so the
+   * gradient holds still while the globe turns.
+   */
+  glow: RefObject<ShaderMaterial | null>;
 };
 
 /** A panel's zoom is a multiplier on the layout's base scale. */
@@ -48,6 +54,9 @@ const opacityFor = (
 /** A panel's tilt is optional; upright is the default. */
 const tiltFor = (state: SphereState) => state.rotX ?? 0;
 
+/** Panels are dark by default, so the halo is opt-in per panel. */
+const glowFor = (state: SphereState) => (state.glow ?? 0) * GLOBE_GLOW.intensity;
+
 /**
  * Tilt outside spin, so the sphere turns about an axis that has been tipped
  * rather than tumbling end over end. "XYZ" is three's default, set here because
@@ -62,6 +71,7 @@ function buildTimeline(
   spin: Object3D,
   land: Material,
   wire: Material,
+  glow: ShaderMaterial,
   path: SphereState[],
   base: number,
   theme: SphereTheme,
@@ -107,7 +117,8 @@ function buildTimeline(
       .to(frame.scale, { x: scale, y: scale, z: scale, duration }, at)
       .to(spin.rotation, { x: tiltFor(state), y: state.rotY, duration }, at)
       .to(land, { opacity: opacityFor(state, theme, "land"), duration }, at)
-      .to(wire, { opacity: opacityFor(state, theme, "wire"), duration }, at);
+      .to(wire, { opacity: opacityFor(state, theme, "wire"), duration }, at)
+      .to(glow.uniforms.uOpacity, { value: glowFor(state), duration }, at);
   });
 }
 
@@ -135,7 +146,8 @@ export function useSphereScroll(nodes: SphereNodes, theme: SphereTheme) {
       const spin = nodes.spin.current;
       const land = nodes.land.current;
       const wire = nodes.wire.current;
-      if (!frame || !spin || !land || !wire) return;
+      const glow = nodes.glow.current;
+      if (!frame || !spin || !land || !wire || !glow) return;
 
       orientAsAxis(spin);
 
@@ -167,6 +179,7 @@ export function useSphereScroll(nodes: SphereNodes, theme: SphereTheme) {
           gsap.set(spin.rotation, { x: tiltFor(start), y: start.rotY });
           gsap.set(land, { opacity: opacityFor(start, theme, "land") });
           gsap.set(wire, { opacity: opacityFor(start, theme, "wire") });
+          gsap.set(glow.uniforms.uOpacity, { value: glowFor(start) });
 
           // Reduced motion: stay locked to the scrollbar rather than easing toward it.
           buildTimeline(
@@ -174,6 +187,7 @@ export function useSphereScroll(nodes: SphereNodes, theme: SphereTheme) {
             spin,
             land,
             wire,
+            glow,
             path,
             base,
             theme,

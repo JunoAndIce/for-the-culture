@@ -25,8 +25,9 @@ if (typeof document !== "undefined") {
 
 export default function Scene() {
   return (
-    // z-1, not z-0: the Backdrop holds z-0, and the globe draws over it.
-    <div className="fixed inset-0 z-1">
+    // Fixed and behind every panel: the sections scroll over a canvas that
+    // never moves, which is what lets one sphere serve all five screens.
+    <div className="fixed inset-0 z-0">
       <Canvas
         camera={{ position: [0, 0, 3], fov: 50 }}
         // Phones often report DPR 3+; uncapped that means ~9x the pixels.

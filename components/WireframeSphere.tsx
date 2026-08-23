@@ -5,7 +5,7 @@ import { useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import { useTheme } from "next-themes";
 import { NoColorSpace } from "three";
-import type { Group, MeshBasicMaterial } from "three";
+import type { Group, MeshBasicMaterial, ShaderMaterial } from "three";
 import {
   BREAKPOINT_MD,
   SPHERE_COLOR,
@@ -14,6 +14,7 @@ import {
   maskUrlFor,
   type Layout,
 } from "@/lib/choreography";
+import GlobeGlow from "./GlobeGlow";
 import { useGlobeDrag } from "@/lib/useGlobeDrag";
 import { useSphereScroll } from "@/lib/useSphereScroll";
 
@@ -26,6 +27,7 @@ export default function WireframeSphere() {
   const spin = useRef<Group>(null);
   const land = useRef<MeshBasicMaterial>(null);
   const wire = useRef<MeshBasicMaterial>(null);
+  const glow = useRef<ShaderMaterial>(null);
 
   // Canvas size, not window — updates on resize without touching `window`.
   const width = useThree((state) => state.size.width);
@@ -56,13 +58,21 @@ export default function WireframeSphere() {
     texture.anisotropy = gl.capabilities.getMaxAnisotropy();
   });
 
-  useSphereScroll({ frame, spin, land, wire }, theme);
+  useSphereScroll({ frame, spin, land, wire, glow }, theme);
   useGlobeDrag(globe);
 
   const segments = [1, widthSegments, heightSegments] as const;
 
   return (
     <group ref={frame}>
+      {/*
+       * Inside frame so the halo travels and scales with the globe, but
+       * outside the drag and spin nodes below, so it neither turns with the
+       * scroll nor swings around when the sphere is dragged. A gradient that
+       * rode the spin would smear; this one stays lit from one side.
+       */}
+      <GlobeGlow materialRef={glow} />
+
       <group ref={globe}>
         {/*
          * Two meshes, not one: a material is either filled or wireframe, so

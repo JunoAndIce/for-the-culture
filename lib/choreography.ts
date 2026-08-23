@@ -31,6 +31,12 @@ export type SphereState = {
    * Omit to use SPHERE_OPACITY for the active theme.
    */
   opacity?: number;
+  /**
+   * Strength of the tri-colour halo on this panel, 0 to 1, scaled by
+   * GLOBE_GLOW.intensity. Omit for no glow — which is every panel but the one
+   * where the globe is yours to spin.
+   */
+  glow?: number;
 };
 
 export type Layout = "desktop" | "mobile";
@@ -47,18 +53,19 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
   // The tilt leans through the middle of the page and unwinds to nothing on
   // the globe panel, so the sphere arrives upright and square to the viewer
   // just as it becomes something to handle, then leans off again for the work.
+  // That panel is also the only one that lights the halo — see `glow`.
   desktop: [
-    { x: 0.9, y: 0, rotY: Math.PI * -0.13, rotX: Math.PI * 0.12, zoom: 1.65, opacity: 0.3, },
-    { x: -1.4, y: 0, rotY: Math.PI * -0.5, rotX: Math.PI * -0.1, zoom: 1.2, opacity: 0.5, },
+    { x: 0.9, y: 0, rotY: Math.PI * -0.13, rotX: Math.PI * 0.12, zoom: 1.65, opacity: 0.3, glow: 1 },
+    { x: -1.4, y: 0, rotY: Math.PI * -0.5, rotX: Math.PI * -0.1, zoom: 1.2, opacity: 0.5, glow: 1 },
     { x: 0, y: -0.3, rotY: Math.PI * 0.1, rotX: Math.PI * 0.5, zoom: 2.5, opacity: 0.1,},
-    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.8, opacity: 1 },
+    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.8, opacity: 1, glow: 1 },
     { x: -1.7, y: 0.25, rotY: Math.PI * 1.9, rotX: Math.PI * 0.16, zoom: 1.7, opacity: 0.05,},
   ],
   mobile: [
     { x: 0, y: 0.75, rotY: 0, rotX: Math.PI * 0.12, zoom: 1.35 },
     { x: 0, y: 0, rotY: Math.PI * 0.6, rotX: Math.PI * 0.18, opacity: 0.1 },
     { x: 0, y: -0.9, rotY: Math.PI * 1.1, rotX: Math.PI * 0.1, zoom: 1.6, opacity: 0.06, },
-    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 1, opacity: 1 },
+    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 1, opacity: 1, glow: 1 },
     { x: 0, y: 1.1, rotY: Math.PI * 2, rotX: Math.PI * 0.3, zoom: 1.5, opacity: 0.04, },
   ],
 };
@@ -110,7 +117,7 @@ export const SPHERE_OPACITY: Record<"light" | "dark", number> = {
  * draws the globe ~1235px across and wants ~3900, mobile ~664px and wants
  * ~2090. The headroom is deliberate, chosen on how it looked: it costs 170MB of
  * VRAM on desktop and 43MB on mobile, against 43MB and 11MB at the measured
- * sizes. earth-mask-2k.png is still in public/ if mobile turns out too heavy.
+ * sizes. design/earth-mask-2k.png is a spare if mobile turns out too heavy.
  */
 export const SPHERE_MASK: Record<Layout, string> = {
   desktop: "/earth-mask-8k.png",
@@ -141,13 +148,42 @@ export const SPHERE_LAYER_OPACITY = {
   wire: 0.05,
 };
 
-/**
- * The wire sphere's radius as a multiple of the land sphere's. The two are
- * otherwise coplanar, and neither writes depth, so which one wins is left to
- * draw order. Floating the wire just outside settles it: the lattice always
- * reads as an outline over the fill rather than flickering through it.
- */
 export const SPHERE_WIRE_OFFSET = 1.003;
+
+export const GLOBE_GLOW = {
+  /** How many motes. Cheap — these are single points, not geometry. */
+  count: 14000,
+  /** Radius of the ring, in globe radii. 1 is exactly the silhouette. */
+  ring: 1.3,
+  /** Gaussian spread of the ring across its radius. Bigger is hazier. */
+  spread: 0.1,
+  /** Gaussian depth through the screen, in globe radii. Gives the ring body. */
+  thickness: 0.07,
+  floor: 1.08,
+  tilt: 0,
+  size: 1.5,
+  /**
+   * How steeply brightness is weighted toward the dim end. 1 is even; higher
+   * leaves most motes faint and a few bright, which is what stops a point
+   * cloud looking like uniform static. Past about 3 the colour stops reading.
+   */
+  contrast: 1.7,
+  /** Ceiling on brightness, before a panel's own `glow` scales it down. */
+  intensity: 1.6,
+  /** Radians per second the ring turns in its own plane. 0 holds it still. */
+  drift: 0.05,
+  /**
+   * Bearing of the colour sweep, in radians. 0 runs left to right — the same
+   * direction as the script line on the services panel.
+   */
+  angle: 0,
+  /**
+   * Red, gold, green. Ordered to match the services gradient rather than the
+   * order they were asked for, so the two read as one palette; swap the
+   * entries to re-run the sweep.
+   */
+  colors: ["#E0413A", "#F4BC48", "#2FA05E"],
+} as const;
 
 /**
  * The one panel whose markup opts into spinning the globe by hand. Every other
