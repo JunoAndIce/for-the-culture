@@ -46,7 +46,7 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
   // just as it becomes something to handle, then leans off again for the work.
   // That panel is also the only one that lights the halo — see `glow`.
   desktop: [
-    { x: 0.9, y: 0, rotY: Math.PI * -0.13, rotX: Math.PI * 0.12, zoom: 1.65, opacity: 0.3, glow: 1, ring: { tilt: 1.1, radius: 1.5 } },
+    { x: 1.5, y: 0, rotY: Math.PI * -0.13, rotX: Math.PI * 0.12, zoom: 1.95, opacity: 0.3, glow: 1, ring: { tilt: 1.11, radius: 1.5 } },
     { x: -1.4, y: 0, rotY: Math.PI * -0.5, rotX: Math.PI * -0.1, zoom: 1.2, opacity: 0.5, glow: 1, ring: { tilt: 1.65, radius: 1.45 } },
     { x: 0, y: -0.3, rotY: Math.PI * 0.1, rotX: Math.PI * 0.5, zoom: 2.5, opacity: 0.1,},
     { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.8, opacity: 1, glow: 1, ring: {spread: 0.1, floor: 1.06} },
@@ -138,11 +138,6 @@ export const GLOBE_GLOW = {
   colors: ["#E0413A", "#F4BC48", "#2FA05E"],
 } as const;
 
-/**
- * The one panel whose markup opts into spinning the globe by hand. Every other
- * panel leaves the sphere entirely to the scroll timeline, so interactivity is
- * scoped by which element exists in the DOM rather than by a runtime check.
- */
 export const GLOBE_STAGE_SELECTOR = "[data-globe-stage]";
 
 /** Radians of spin per pixel dragged. */

@@ -1,3 +1,4 @@
+import Footer from "@/components/Footer";
 import Globe from "@/components/Globe";
 import Loader from "@/components/Loader";
 import Home from "@/components/Home";
@@ -23,6 +24,8 @@ export default function Page() {
         <Globe />
         <Projects />
       </main>
+
+      <Footer />
     </div>
   );
 }

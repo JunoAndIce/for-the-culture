@@ -189,19 +189,6 @@ export default function Projects() {
               <TabsTrigger
                 key={project.slug}
                 value={project.slug}
-                /*
-                 * A row below lg, the sidebar column above it. Radix takes
-                 * orientation as one fixed value, so the axis is flipped in CSS
-                 * rather than by prop — doing it by prop would mean a client
-                 * boundary and a visible flip on first paint.
-                 *
-                 * The bangs are load-bearing: the component's own rules are
-                 * scoped under the root's [data-orientation=vertical], which
-                 * outranks a plain breakpoint utility. The active marker is
-                 * hidden and redrawn as an underline on before:, which nothing
-                 * in the component styles, rather than unpicking the three
-                 * rules that park it against the right edge.
-                 */
                 className="w-full gap-3 py-2 text-xs tracking-widest uppercase max-lg:w-auto! max-lg:justify-center! max-lg:whitespace-normal! max-lg:after:hidden max-lg:before:absolute max-lg:before:inset-x-0 max-lg:before:bottom-[-5px] max-lg:before:h-0.5 max-lg:before:origin-center max-lg:before:scale-x-0 max-lg:before:bg-foreground max-lg:before:transition-transform max-lg:before:duration-300 max-lg:data-active:before:scale-x-100 motion-reduce:before:transition-none"
               >
                 <span className="text-foreground/40 tabular-nums max-lg:hidden">

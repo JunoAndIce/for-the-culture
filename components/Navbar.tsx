@@ -2,14 +2,7 @@
 
 import { useState } from "react";
 
-const NAV_ITEMS = [
-  "Overview",
-  "Affiliations",
-  "Projects",
-  "Resources",
-  "Family",
-  "Contact Us"
-] as const;
+import { NAV_ITEMS } from "@/lib/nav";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
