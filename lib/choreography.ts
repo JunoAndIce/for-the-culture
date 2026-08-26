@@ -16,6 +16,17 @@ export type RingState = {
   floor?: number;
   thickness?: number;
   size?: number;
+  /** 0 = Gaussian halo (default), 1 = flat banded ring system. */
+  disc?: number;
+  /** Annulus bounds in globe radii. Only read when `disc` is above 0. */
+  inner?: number;
+  outer?: number;
+  /** Division across the annulus: 0 is the inner edge, 1 the outer. */
+  gap?: number;
+  gapWidth?: number;
+  /** Ringlets across the annulus. Depth 0 is featureless. */
+  bandFreq?: number;
+  bandDepth?: number;
 };
 
 export type SphereState = {
@@ -46,18 +57,196 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
   // just as it becomes something to handle, then leans off again for the work.
   // That panel is also the only one that lights the halo — see `glow`.
   desktop: [
-    { x: 1.5, y: 0, rotY: Math.PI * -0.13, rotX: Math.PI * 0.12, zoom: 1.95, opacity: 0.3, glow: 1, ring: { tilt: 1.11, radius: 1.5 } },
-    { x: -1.4, y: 0, rotY: Math.PI * -0.5, rotX: Math.PI * -0.1, zoom: 1.2, opacity: 0.5, glow: 1, ring: { tilt: 1.65, radius: 1.45 } },
-    { x: 0, y: -0.3, rotY: Math.PI * 0.1, rotX: Math.PI * 0.5, zoom: 2.5, opacity: 0.1,},
-    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.8, opacity: 1, glow: 1, ring: {spread: 0.1, floor: 1.06} },
-    { x: -1.7, y: 0.25, rotY: Math.PI * 1.9, rotX: Math.PI * 0.16, zoom: 1.7, opacity: 0.05, glow: 1, ring: { tilt: 1.57, radius: 1.45 }},
+    {
+      x: 1.5,
+      y: 0,
+      rotY: Math.PI * -0.13,
+      rotX: Math.PI * 0.12,
+      zoom: 1.95,
+      opacity: 0.3,
+      glow: 1,
+      ring: {
+        tilt: 1.18,
+        radius: 1.25,
+        floor: 1.02,
+        thickness: 0.004,
+        size: 1.2,
+        disc: 1,
+        inner: 1.07,
+        outer: 1.44,
+        gap: 0.5,
+        gapWidth: 0.06,
+        bandFreq: 9,
+        bandDepth: 0.55,
+      },
+    },
+    {
+      x: -1.4,
+      y: 0,
+      rotY: Math.PI * -0.5,
+      rotX: Math.PI * -0.1,
+      zoom: 1.2,
+      opacity: 0.5,
+      glow: 1,
+      ring: {
+        tilt: 1.85,
+        radius: 1.45,
+        floor: 1.02,
+        thickness: 0.004,
+        size: 1.2,
+        disc: 1,
+        inner: 1.07,
+        outer: 1.44,
+        gap: 0.5,
+        gapWidth: 0.06,
+        bandFreq: 9,
+        bandDepth: 0.55,
+      },
+    },
+    {
+      x: 0,
+      y: -0.3,
+      rotY: Math.PI * 0.1,
+      rotX: Math.PI * 0.5,
+      zoom: 2.5,
+      opacity: 0.1,
+    },
+    {
+      x: 0,
+      y: 0,
+      rotY: Math.PI * 1.5,
+      rotX: 0,
+      zoom: 0.8,
+      opacity: 1,
+      glow: 1,
+      ring: { spread: 0.1, floor: 1.06, tilt: 0 },
+    },
+    {
+      x: -1.7,
+      y: 0.25,
+      rotY: Math.PI * 1.9,
+      rotX: Math.PI * 0.16,
+      zoom: 1.7,
+      opacity: 0.05,
+      glow: 1,
+      ring: {
+        tilt: 1.25,
+        radius: 1.45,
+        floor: 1.02,
+        thickness: 0.004,
+        size: 1.2,
+        disc: 1,
+        inner: 1.07,
+        outer: 1.44,
+        gap: 0.5,
+        gapWidth: 0.06,
+        bandFreq: 9,
+        bandDepth: 0.55,
+      },
+    },
   ],
   mobile: [
-    { x: 0, y: 0.75, rotY: 0, rotX: Math.PI * 0.12, zoom: 0.95, opacity: 0.2, glow: 1, ring: { tilt: 2.2, radius: 1.5 } },
-    { x: 0, y: 0, rotY: Math.PI * 0.6, rotX: Math.PI * 0.18, zoom: 0.75, opacity: 0.08, glow: 1, ring: { tilt: 1.85, radius: 1.45 } },
-    { x: 0, y: -0.9, rotY: Math.PI * 1.1, rotX: Math.PI * 0.1, zoom: 1.6, opacity: 0.06, glow: 1, ring: { tilt: 1.05, radius: 1.45 } },
-    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.85, opacity: 1, glow: 1 },
-    { x: 0, y: 0.02, rotY: Math.PI * 2, rotX: Math.PI * 0.3, zoom: 1.1, opacity: 0.04, glow: 1, ring: { tilt: 1.17, radius: 1.45 } },
+    {
+      x: 0,
+      y: 0.75,
+      rotY: 0,
+      rotX: Math.PI * 0.12,
+      zoom: 0.95,
+      opacity: 0.2,
+      glow: 1,
+      ring: {
+        tilt: 1.22,
+        radius: 1.25,
+        floor: 1.02,
+        thickness: 0.004,
+        size: 1.2,
+        disc: 1,
+        inner: 1.07,
+        outer: 1.44,
+        gap: 0.5,
+        gapWidth: 0.06,
+        bandFreq: 9,
+        bandDepth: 0.55,
+      },
+    },
+    {
+      x: 0,
+      y: 0,
+      rotY: Math.PI * 0.6,
+      rotX: Math.PI * 0.18,
+      zoom: 0.75,
+      opacity: 0.08,
+      glow: 1,
+      ring: {
+        tilt: 1.11,
+        radius: 1.45,
+        floor: 1.02,
+        thickness: 0.004,
+        size: 1.2,
+        disc: 1,
+        inner: 1.07,
+        outer: 1.44,
+        gap: 0.5,
+        gapWidth: 0.06,
+        bandFreq: 9,
+        bandDepth: 0.55,
+      },
+    },
+    {
+      x: 0,
+      y: -0.9,
+      rotY: Math.PI * 1.1,
+      rotX: Math.PI * 0.1,
+      zoom: 1.6,
+      opacity: 0.06,
+      glow: 1,
+      ring: {
+        tilt: 1.05,
+        radius: 1.45,
+        floor: 1.02,
+        thickness: 0.004,
+        size: 1.2,
+        disc: 1,
+        inner: 1.07,
+        outer: 1.44,
+        gap: 0.5,
+        gapWidth: 0.06,
+        bandFreq: 9,
+        bandDepth: 0.55,
+      },
+    },
+    {
+      x: 0,
+      y: 0,
+      rotY: Math.PI * 1.5,
+      rotX: 0,
+      zoom: 0.85,
+      opacity: 1,
+      glow: 1,
+    },
+    {
+      x: 0,
+      y: 0.02,
+      rotY: Math.PI * 2,
+      rotX: Math.PI * 0.3,
+      zoom: 1.1,
+      opacity: 0.04,
+      glow: 1,
+      ring: {
+        tilt: 1.17,
+        radius: 1.45,
+        floor: 1.02,
+        thickness: 0.004,
+        size: 1.2,
+        disc: 1,
+        inner: 1.07,
+        outer: 1.44,
+        gap: 0.5,
+        gapWidth: 0.06,
+        bandFreq: 9,
+        bandDepth: 0.55,
+      },
+    },
   ],
 };
 
@@ -113,7 +302,7 @@ export const SPHERE_WIRE_OFFSET = 1.003;
 
 export const GLOBE_GLOW = {
   /** How many motes. Baked at mount, so this one cannot be per-panel. */
-  count: 14000,
+  count: 48000,
   /** Ring radius in globe radii. 1 is exactly the silhouette. */
   ring: 1.18,
   /** Gaussian spread across the radius. Bigger is hazier. */
@@ -126,6 +315,17 @@ export const GLOBE_GLOW = {
   tilt: 0,
   /** Mote size in CSS pixels. */
   size: 1.5,
+  /**
+   * Ring-system profile, off by default so every panel keeps the soft halo.
+   * Panel one turns it on: see SPHERE_PATH.
+   */
+  disc: 0,
+  inner: 1.25,
+  outer: 2,
+  gap: 0.55,
+  gapWidth: 0.05,
+  bandFreq: 6,
+  bandDepth: 0.35,
   /** Brightness weighting toward the dim end. Baked, so not per-panel. */
   contrast: 1.7,
   /** Ceiling on brightness, before a panel's own `glow` scales it down. */

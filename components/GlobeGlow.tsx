@@ -24,12 +24,20 @@ function mulberry32(seed: number) {
 const vertexShader = /* glsl */ `
   attribute float aBright;
   attribute float aSize;
+  attribute float aU;
 
   uniform float uRing;
   uniform float uSpread;
   uniform float uFloor;
   uniform float uThickness;
   uniform float uSize;
+  uniform float uDisc;
+  uniform float uInner;
+  uniform float uOuter;
+  uniform float uGap;
+  uniform float uGapWidth;
+  uniform float uBandFreq;
+  uniform float uBandDepth;
   uniform float uPixelRatio;
   uniform float uAngle;
   uniform vec3 uColorA;
@@ -40,7 +48,15 @@ const vertexShader = /* glsl */ `
 
   void main() {
     float bearing = position.x;
-    float radius = max(uFloor, uRing + position.y * uSpread);
+
+    // Two radial profiles, blended by uDisc. At 0 this is the original halo: a
+    // Gaussian bell about uRing, dense in the middle and hazy at both edges.
+    // At 1 it is a ring system — motes spread evenly between a hard inner and
+    // outer edge, which is what gives Saturn its cut-out silhouette. A Gaussian
+    // cannot do that; its tails have no edge to see.
+    float halo = uRing + position.y * uSpread;
+    float disc = mix(uInner, uOuter, aU);
+    float radius = max(uFloor, mix(halo, disc, uDisc));
     vec3 local = vec3(
       cos(bearing) * radius,
       sin(bearing) * radius,
@@ -51,9 +67,17 @@ const vertexShader = /* glsl */ `
     float t = clamp(
       dot(local.xy, vec2(cos(uAngle), sin(uAngle))) / (2.0 * uRing) + 0.5, 0.0, 1.0
     );
-    vColor = aBright * (t < 0.5
+    vec3 swept = aBright * (t < 0.5
       ? mix(uColorA, uColorB, t * 2.0)
       : mix(uColorB, uColorC, (t - 0.5) * 2.0));
+
+    // Ringlets and one wide division, as brightness rather than position: the
+    // motes stay evenly spread, so a gap reads as material thinning out instead
+    // of a suspiciously empty band.
+    float across = clamp((radius - uInner) / max(uOuter - uInner, 1e-4), 0.0, 1.0);
+    float ringlets = 1.0 - uBandDepth * 0.5 * (1.0 + sin(across * uBandFreq * 6.2831853));
+    float division = smoothstep(uGapWidth, 0.0, abs(across - uGap));
+    vColor = swept * mix(1.0, ringlets * (1.0 - division), uDisc);
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(local, 1.0);
     // Flat, not distance-attenuated: constant motes read as dust, attenuated as
@@ -91,12 +115,13 @@ export default function GlobeGlow({
 }) {
   const spin = useRef<Points>(null);
 
-  const { seeds, bright, sizes } = useMemo(() => {
+  const { seeds, bright, sizes, uniformDraw } = useMemo(() => {
     const { count, contrast } = GLOBE_GLOW;
     const random = mulberry32(0x5eed);
     const seeds = new Float32Array(count * 3);
     const bright = new Float32Array(count);
     const sizes = new Float32Array(count);
+    const uniformDraw = new Float32Array(count);
 
     // Box-Muller, two draws a call so radius and depth never share a value.
     const gaussian = () => {
@@ -111,9 +136,12 @@ export default function GlobeGlow({
       // Weighted to the dim end, or the cloud reads as uniform static.
       bright[i] = Math.pow(random(), contrast);
       sizes[i] = 0.6 + random() * 0.8;
+      // Flat 0..1, unlike the Gaussian above: an even spread across the annulus
+      // is what makes the ring's edges hard.
+      uniformDraw[i] = random();
     }
 
-    return { seeds, bright, sizes };
+    return { seeds, bright, sizes, uniformDraw };
   }, []);
 
   const uniforms = useMemo(() => {
@@ -124,6 +152,13 @@ export default function GlobeGlow({
       uFloor: { value: GLOBE_GLOW.floor },
       uThickness: { value: GLOBE_GLOW.thickness },
       uSize: { value: GLOBE_GLOW.size },
+      uDisc: { value: GLOBE_GLOW.disc },
+      uInner: { value: GLOBE_GLOW.inner },
+      uOuter: { value: GLOBE_GLOW.outer },
+      uGap: { value: GLOBE_GLOW.gap },
+      uGapWidth: { value: GLOBE_GLOW.gapWidth },
+      uBandFreq: { value: GLOBE_GLOW.bandFreq },
+      uBandDepth: { value: GLOBE_GLOW.bandDepth },
       uAngle: { value: GLOBE_GLOW.angle },
       uPixelRatio: { value: 1 },
       uOpacity: { value: 0 },
@@ -153,6 +188,7 @@ export default function GlobeGlow({
           <bufferAttribute attach="attributes-position" args={[seeds, 3]} />
           <bufferAttribute attach="attributes-aBright" args={[bright, 1]} />
           <bufferAttribute attach="attributes-aSize" args={[sizes, 1]} />
+          <bufferAttribute attach="attributes-aU" args={[uniformDraw, 1]} />
         </bufferGeometry>
         <shaderMaterial
           ref={materialRef}

@@ -51,7 +51,8 @@ const opacityFor = (
 const tiltFor = (state: SphereState) => state.rotX ?? 0;
 
 /** Panels are dark by default, so the ring is opt-in per panel. */
-const glowFor = (state: SphereState) => (state.glow ?? 0) * GLOBE_GLOW.intensity;
+const glowFor = (state: SphereState) =>
+  (state.glow ?? 0) * GLOBE_GLOW.intensity;
 
 /** A panel's ring overrides, over the GLOBE_GLOW defaults. */
 const ringFor = (state: SphereState) => ({
@@ -61,6 +62,13 @@ const ringFor = (state: SphereState) => ({
   floor: GLOBE_GLOW.floor,
   thickness: GLOBE_GLOW.thickness,
   size: GLOBE_GLOW.size,
+  disc: GLOBE_GLOW.disc,
+  inner: GLOBE_GLOW.inner,
+  outer: GLOBE_GLOW.outer,
+  gap: GLOBE_GLOW.gap,
+  gapWidth: GLOBE_GLOW.gapWidth,
+  bandFreq: GLOBE_GLOW.bandFreq,
+  bandDepth: GLOBE_GLOW.bandDepth,
   ...state.ring,
 });
 
@@ -86,6 +94,13 @@ function poseFor(
     [u.uFloor, { value: ring.floor }],
     [u.uThickness, { value: ring.thickness }],
     [u.uSize, { value: ring.size }],
+    [u.uDisc, { value: ring.disc }],
+    [u.uInner, { value: ring.inner }],
+    [u.uOuter, { value: ring.outer }],
+    [u.uGap, { value: ring.gap }],
+    [u.uGapWidth, { value: ring.gapWidth }],
+    [u.uBandFreq, { value: ring.bandFreq }],
+    [u.uBandDepth, { value: ring.bandDepth }],
   ];
 }
 
