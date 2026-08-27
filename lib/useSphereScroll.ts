@@ -51,8 +51,8 @@ const opacityFor = (
 const tiltFor = (state: SphereState) => state.rotX ?? 0;
 
 /** Panels are dark by default, so the ring is opt-in per panel. */
-const glowFor = (state: SphereState) =>
-  (state.glow ?? 0) * GLOBE_GLOW.intensity;
+const glowFor = (state: SphereState, layout: Layout) =>
+  (state.glow ?? 0) * GLOBE_GLOW.intensity[layout];
 
 /** A panel's ring overrides, over the GLOBE_GLOW defaults. */
 const ringFor = (state: SphereState) => ({
@@ -76,9 +76,9 @@ const ringFor = (state: SphereState) => ({
 function poseFor(
   n: Resolved,
   state: SphereState,
-  base: number,
+  layout: Layout,
 ): [object, Record<string, number>][] {
-  const scale = scaleFor(state, base);
+  const scale = scaleFor(state, SPHERE_SCALE[layout]);
   const ring = ringFor(state);
   const u = n.glow.uniforms;
   return [
@@ -88,7 +88,7 @@ function poseFor(
     [n.land, { opacity: opacityFor(state, "land") }],
     [n.wire, { opacity: opacityFor(state, "wire") }],
     [n.glowTilt.rotation, { x: ring.tilt }],
-    [u.uOpacity, { value: glowFor(state) }],
+    [u.uOpacity, { value: glowFor(state, layout) }],
     [u.uRing, { value: ring.radius }],
     [u.uSpread, { value: ring.spread }],
     [u.uFloor, { value: ring.floor }],
@@ -112,7 +112,7 @@ function orientAsAxis(spin: Object3D) {
 function buildTimeline(
   n: Resolved,
   path: SphereState[],
-  base: number,
+  layout: Layout,
   reduceMotion: boolean,
 ) {
   const panels = gsap.utils.toArray<HTMLElement>(PANEL_SELECTOR);
@@ -142,7 +142,7 @@ function buildTimeline(
     // Each segment lasts the real scroll distance between its two panels, so
     // adding a panel extends the timeline instead of retiming earlier ones.
     const duration = (tops[i + 1] - tops[i]) / span;
-    poseFor(n, state, base).forEach(([target, vars], k) => {
+    poseFor(n, state, layout).forEach(([target, vars], k) => {
       tl.to(target, { ...vars, duration }, k > 0 ? "<" : i === 0 ? 0 : ">");
     });
   });
@@ -234,14 +234,13 @@ export function useSphereScroll(nodes: SphereNodes) {
 
           const layout: Layout = isDesktop ? "desktop" : "mobile";
           const path = SPHERE_PATH[layout];
-          const base = SPHERE_SCALE[layout];
 
           // Establish the layout's starting pose before the triggers capture it.
-          poseFor(n, path[0], base).forEach(([target, vars]) =>
+          poseFor(n, path[0], layout).forEach(([target, vars]) =>
             gsap.set(target, vars),
           );
 
-          buildTimeline(n, path, base, reduceMotion);
+          buildTimeline(n, path, layout, reduceMotion);
         },
       );
     },

@@ -89,7 +89,7 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
       opacity: 0.5,
       glow: 1,
       ring: {
-        tilt: 1.85,
+        tilt: 1.15,
         radius: 1.45,
         floor: 1.02,
         thickness: 0.004,
@@ -109,7 +109,7 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
       rotY: Math.PI * 0.1,
       rotX: Math.PI * 0.5,
       zoom: 2.5,
-      opacity: 0.1,
+      opacity: 0.02,
     },
     {
       x: 0,
@@ -178,7 +178,7 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
       opacity: 0.08,
       glow: 1,
       ring: {
-        tilt: 1.11,
+        tilt: 1.91,
         radius: 1.45,
         floor: 1.02,
         thickness: 0.004,
@@ -198,7 +198,7 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
       rotY: Math.PI * 1.1,
       rotX: Math.PI * 0.1,
       zoom: 1.6,
-      opacity: 0.06,
+      opacity: 0.03,
       glow: 1,
       ring: {
         tilt: 1.05,
@@ -328,8 +328,11 @@ export const GLOBE_GLOW = {
   bandDepth: 0.35,
   /** Brightness weighting toward the dim end. Baked, so not per-panel. */
   contrast: 1.7,
-  /** Ceiling on brightness, before a panel's own `glow` scales it down. */
-  intensity: 2,
+  /**
+   * Ceiling on brightness, before a panel's own `glow` scales it down. Mobile
+   * runs dimmer, since the ring covers far more of a portrait viewport.
+   */
+  intensity: { desktop: 2, mobile: 1 } as Record<Layout, number>,
   /** Radians per second the ring turns in its own plane. */
   drift: 0.03,
   /** Bearing of the colour sweep, in radians. 0 runs left to right. */
