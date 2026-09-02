@@ -3,7 +3,6 @@ import { Gelasio, Geist, Geist_Mono, Inter, Italianno } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
-import ThemeToggle from "@/components/ThemeToggle";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -69,7 +68,6 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <ThemeToggle />
           {children}
         </ThemeProvider>
       </body>
