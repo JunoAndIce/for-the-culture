@@ -15,6 +15,7 @@ import {
   type Layout,
 } from "@/lib/choreography";
 import GlobeGlow from "./GlobeGlow";
+import Waypoints from "./Waypoints";
 import { useGlobeDrag } from "@/lib/useGlobeDrag";
 import { useSphereScroll } from "@/lib/useSphereScroll";
 
@@ -77,6 +78,8 @@ export default function WireframeSphere() {
       {/* Inside frame so it travels and scales with the globe, but above the drag
           and spin nodes, so the baked colour sweep never turns with it. */}
       <GlobeGlow materialRef={glow} tiltRef={glowTilt} />
+
+      <Waypoints spin={spin} />
 
       <group ref={globe}>
         {/*
