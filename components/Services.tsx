@@ -1,190 +1,169 @@
-import { Clock, Globe, Layers, Users } from "lucide-react";
+import {
+  ArrowRight,
+  ChartLine,
+  MonitorPlay,
+  Palette,
+  Radio,
+  Search,
+} from "lucide-react";
 import ScriptReveal from "@/components/ScriptReveal";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-/**
- * Figures worth leading with, rather than a claim the reader has to take on
- * trust. The three continents are the ones the globe panel already names —
- * Lagos, Lisbon, Little Rock — so the two screens agree.
- */
-const STATS = [
-  { icon: Layers, value: "40+", label: "Brands launched" },
-  { icon: Clock, value: "9 WKS", label: "Median build" },
-  { icon: Globe, value: "3", label: "Continents served" },
-  { icon: Users, value: "100%", label: "Founder owned" },
+const SERVICES = [
+  {
+    icon: Radio,
+    name: "Traditional Media",
+    body: "Radio, print, and out-of-home. The buys that still own a neighbourhood.",
+  },
+  {
+    icon: MonitorPlay,
+    name: "Digital Media",
+    body: "Paid social, video, and display, put in front of the people most likely to buy.",
+  },
+  {
+    icon: Search,
+    name: "Search & SEO",
+    body: "Turn up first when somebody nearby searches for what you already sell.",
+  },
+  {
+    icon: Palette,
+    name: "Branding & Design",
+    body: "Name, mark, packaging, and a look that survives contact with the real world.",
+  },
+  {
+    icon: ChartLine,
+    name: "Strategy & Research",
+    body: "Who your customer is, what moves them, and what the last dollar brought back.",
+  },
 ] as const;
 
-const FEATURES = [
+// The way in. Numbered because it is a real sequence, and step one costs nothing.
+const STEPS = [
   {
-    title: "Brand Identity",
-    body: "Naming, logo systems, and a visual language built to scale with you.",
-    detail:
-      "We start with positioning and naming, then build the mark, type scale, and colour system around it. You leave with a usage guide so the brand holds together whoever touches it next.",
-    tags: ["Naming", "Identity", "Guidelines"],
+    n: "01",
+    title: "Tell us where you are",
+    body: "One call. No deck, no budget figure required.",
   },
   {
-    title: "Web & Product",
-    body: "Sites and platforms designed, built, and shipped end to end.",
-    detail:
-      "Design and engineering under one roof — no handoff gap. Marketing sites, booking flows, and customer portals, built on a stack you can maintain or hand to an in-house team later.",
-    tags: ["Design", "Build", "Handover"],
+    n: "02",
+    title: "We map it out",
+    body: "What to do first, what it costs, what it should bring back.",
   },
   {
-    title: "Go-To-Market",
-    body: "Positioning, messaging, and launch campaigns that actually bear fruit.",
-    detail:
-      "We pin down who you are for and why they should care, then turn that into launch assets, paid and organic channels, and a measurement plan so you can tell what worked.",
-    tags: ["Strategy", "Launch", "Analytics"],
+    n: "03",
+    title: "We run it",
+    body: "Built and managed in-house, with the numbers open to you throughout.",
   },
-  {
-    title: "Operations Setup",
-    body: "Entity formation, tooling, and process so you can run lean from day one.",
-    detail:
-      "Entity filing, banking, contracts, and the software stack that keeps admin small. We document the process so the business does not live only in your head.",
-    tags: ["Formation", "Tooling", "Process"],
-  },
-  {
-    title: "Creative Direction",
-    body: "Art direction and content that keeps the brand coherent as it grows.",
-    detail:
-      "Ongoing art direction across campaigns, photo and video, and social. The point is consistency: every piece should look like it came from the same company.",
-    tags: ["Art Direction", "Content", "Social"],
-  },
-  {
-    title: "Ongoing Advisory",
-    body: "A partner on retainer well past the first milestone.",
-    detail:
-      "Standing time each month for the decisions that do not fit a project scope — hiring, pricing, the next raise, or the next market. You keep the context you already paid for.",
-    tags: ["Retainer", "Advisory", "Growth"],
-  },
+] as const;
+
+// Proof on one line. The stat grid this replaces cost a third of the panel.
+const PROOF = [
+  "40+ brands launched",
+  "9-week median build",
+  "100% founder owned",
 ] as const;
 
 export default function Services() {
   return (
     <section data-panel className="grid min-h-screen p-8 md:p-16 xl:p-24">
-      {/*
-       * The block stays on the right because the sphere sits left on this
-       * panel (SPHERE_PATH desktop index 1). Only the text alignment inside it
-       * changed to left, which is what makes the headline and the stat row
-       * read as one column rather than a centred stack.
-       */}
       <div className="flex flex-col justify-center md:items-end">
         <div className="flex w-full flex-col items-start text-left md:mr-12 md:max-w-3xl">
-          {/*
-           * Red to yellow to green, taken from the backdrop artwork so the
-           * script matches the borders behind it. Two sets of stops: the
-           * artwork's own yellow is 1.7:1 on a white page and would vanish in
-           * the light theme, so that one darkens while the reds and greens
-           * lighten for the dark theme. All six clear AA.
-           *
-           * The vertical padding is load-bearing. bg-clip-text only paints
-           * glyph pixels that fall inside the element's background box, and a
-           * script face throws descenders and swashes well past a tight line
-           * box — without the padding their tails come out unpainted.
-           */}
-          <ScriptReveal className="bg-linear-to-r from-[#AF2F34] via-[#A57100] to-[#1F7C44] bg-clip-text pt-[0.06em] pb-[0.22em] font-cochocib text-[clamp(3rem,7vw,5.5rem)] leading-[0.95] text-transparent dark:from-[#D75555] dark:via-[#F4BC48] dark:to-[#4AA167]">
+          <ScriptReveal className="bg-linear-to-r from-[#AF2F34] via-[#A57100] to-[#1F7C44] bg-clip-text pt-[0.06em] pb-[0.22em] font-cochocib text-[clamp(2.5rem,5.5vw,4.5rem)] leading-[0.95] text-transparent dark:from-[#D75555] dark:via-[#F4BC48] dark:to-[#4AA167]">
             For the Culture
           </ScriptReveal>
 
-          {/* Red is the site's existing accent. 500 on the dark theme and 700
-              on the light one are the two steps that clear AA at this size. */}
-          <p className="mt-6 font-mono text-[0.65rem] tracking-[0.35em] text-red-700 uppercase md:text-xs dark:text-red-500">
-            What we do
+          <p className="mt-5 font-mono text-[0.65rem] tracking-[0.35em] text-red-700 uppercase md:text-xs dark:text-red-500">
+            What we do, and who for
           </p>
 
-          {/* Facts in full strength, the claim they support in half. */}
-          <h2 className="mt-3 text-[clamp(1.75rem,4.2vw,3.25rem)] leading-[1.05] font-bold tracking-tight text-balance">
-            <span>40 brands. 3 continents. One community.</span>{" "}
+          <h2 className="mt-3 text-[clamp(1.6rem,3.6vw,2.75rem)] leading-[1.08] font-bold tracking-tight text-balance">
+            <span>
+              Agency work for the businesses the agencies never called.
+            </span>{" "}
             <span className="text-foreground/50">
-              Built with the culture, never about it.
+              You bring the business. We bring the studio, the airtime, and the
+              plan behind both.
             </span>
           </h2>
 
-          <p className="mt-5 max-w-xl font-mono text-xs leading-relaxed text-foreground/70 md:text-sm">
-            For the Culture of Texas. Brand, web, and go-to-market under one
-            roof, built to outlive the launch.
+          <p className="mt-4 max-w-xl font-mono text-xs leading-relaxed text-foreground/70 md:text-sm">
+            Five services, one team. No matter where you start from, we're here to help you get seen, and get found.
+            It's time to stop worrying about the small stuff, and move onto the bigger picture: your business, your brand, and your legacy.
           </p>
 
-          <dl className="mt-8 grid w-full grid-cols-2 gap-x-6 gap-y-6 border-t border-foreground/15 pt-6 sm:grid-cols-4">
-            {STATS.map(({ icon: Icon, value, label }) => (
-              // order-last puts the label under the figure while leaving dt
-              // ahead of its dd in the markup, which is the order HTML wants.
-              <div key={label} className="flex flex-col">
-                <Icon
-                  aria-hidden="true"
-                  strokeWidth={1.75}
-                  className="mb-3 size-4 text-red-700 dark:text-red-500"
-                />
-                <dt className="order-last mt-1 font-mono text-[0.65rem] tracking-[0.2em] text-foreground/60 uppercase">
-                  {label}
-                </dt>
-                <dd className="text-2xl font-bold tracking-tight md:text-3xl">
-                  {value}
-                </dd>
-              </div>
-            ))}
-          </dl>
-
-          <Tabs
-            defaultValue={FEATURES[0].title}
-            className="mt-10 w-full text-left"
-          >
-            {/* Grid rather than flex-wrap: fixed columns give even rows instead
-                of a ragged 4+2, and the row gap leaves room for the line
-                variant's underline, which sits outside the trigger box. */}
-            <TabsList
-              variant="line"
-              className="grid w-full grid-cols-2 gap-x-2 gap-y-3 group-data-horizontal/tabs:h-auto md:grid-cols-3 md:gap-y-4"
-            >
-              {FEATURES.map((feature) => (
-                <TabsTrigger
-                  key={feature.title}
-                  value={feature.title}
-                  className="w-full text-[0.7rem] tracking-widest whitespace-normal uppercase md:text-xs after:origin-center after:scale-x-0 after:opacity-100 after:transition-transform after:duration-300 data-active:after:scale-x-100 motion-reduce:after:transition-none"
+          {/* A ruled list, not a card grid: five does not divide into columns,
+              and the rows let the name and its plain-English line share a
+              baseline that can be scanned in a breath. */}
+          <ul className="mt-7 w-full border-t border-foreground/15">
+            {SERVICES.map(({ icon: Icon, name, body }) => (
+              <li key={name}>
+                <a
+                  href="#"
+                  className="group grid grid-cols-[auto_1fr_auto] items-center gap-x-4 border-b border-foreground/15 py-3 transition-colors hover:border-foreground/40 md:grid-cols-[auto_13rem_1fr_auto] md:gap-x-6"
                 >
-                  {feature.title}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
-            {FEATURES.map((feature) => (
-              <TabsContent
-                key={feature.title}
-                value={feature.title}
-                // min-h keeps the panel from jumping as you switch tabs.
-                className="mt-5 min-h-40 rounded-lg border border-foreground/15 bg-foreground/5 p-5"
-              >
-                <p className="text-sm tracking-widest text-foreground uppercase">
-                  {feature.title}
-                </p>
-                <p className="mt-2 text-xs leading-relaxed font-light text-foreground/70 md:text-sm">
-                  {feature.body}
-                </p>
-                <p className="mt-3 text-xs leading-relaxed font-light text-foreground/60">
-                  {feature.detail}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-1.5">
-                  {feature.tags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="outline"
-                      className="border-foreground/25 tracking-widest text-foreground/70 uppercase"
-                    >
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </TabsContent>
+                  <Icon
+                    aria-hidden="true"
+                    strokeWidth={1.6}
+                    className="size-4 shrink-0 text-red-700 dark:text-red-500"
+                  />
+                  <span className="text-[0.7rem] tracking-widest text-foreground uppercase md:text-xs">
+                    {name}
+                  </span>
+                  <span className="col-span-2 col-start-2 mt-1 text-xs leading-relaxed font-light text-foreground/60 md:col-span-1 md:col-start-3 md:mt-0">
+                    {body}
+                  </span>
+                  <ArrowRight
+                    aria-hidden="true"
+                    strokeWidth={1.6}
+                    className="col-start-3 row-start-1 size-4 shrink-0 text-foreground/30 transition-transform group-hover:translate-x-1 motion-reduce:transition-none md:col-start-4"
+                  />
+                </a>
+              </li>
             ))}
-          </Tabs>
+          </ul>
 
-          <a
-            href="#"
-            className="mt-8 rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10"
-          >
-            Learn More
-          </a>
+          <ol className="mt-7 grid w-full gap-4 sm:grid-cols-3">
+            {STEPS.map(({ n, title, body }) => (
+              <li key={n}>
+                <span className="font-mono text-[0.65rem] tracking-[0.2em] text-red-700 dark:text-red-500">
+                  {n}
+                </span>
+                <p className="mt-1 text-[0.7rem] tracking-widest text-foreground uppercase">
+                  {title}
+                </p>
+                <p className="mt-1 text-xs leading-relaxed font-light text-foreground/60">
+                  {body}
+                </p>
+              </li>
+            ))}
+          </ol>
+
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <a
+              href="#"
+              className="rounded-lg bg-foreground px-6 py-3 text-xs tracking-widest text-background uppercase transition-colors hover:bg-foreground/80"
+            >
+              Start with a conversation
+            </a>
+            <a
+              href="#"
+              className="rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10"
+            >
+              See the work
+            </a>
+          </div>
+
+          <ul className="mt-6 flex w-full flex-wrap items-center gap-x-3 gap-y-1 border-t border-foreground/15 pt-4 font-mono text-[0.65rem] tracking-[0.15em] text-foreground/50 uppercase">
+            {PROOF.map((fact, i) => (
+              <li key={fact} className="flex items-center gap-3">
+                {i > 0 && (
+                  <span aria-hidden="true" className="text-foreground/25">
+                    &bull;
+                  </span>
+                )}
+                {fact}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>
