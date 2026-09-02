@@ -48,12 +48,6 @@ const vertexShader = /* glsl */ `
 
   void main() {
     float bearing = position.x;
-
-    // Two radial profiles, blended by uDisc. At 0 this is the original halo: a
-    // Gaussian bell about uRing, dense in the middle and hazy at both edges.
-    // At 1 it is a ring system — motes spread evenly between a hard inner and
-    // outer edge, which is what gives Saturn its cut-out silhouette. A Gaussian
-    // cannot do that; its tails have no edge to see.
     float halo = uRing + position.y * uSpread;
     float disc = mix(uInner, uOuter, aU);
     float radius = max(uFloor, mix(halo, disc, uDisc));
@@ -71,9 +65,6 @@ const vertexShader = /* glsl */ `
       ? mix(uColorA, uColorB, t * 2.0)
       : mix(uColorB, uColorC, (t - 0.5) * 2.0));
 
-    // Ringlets and one wide division, as brightness rather than position: the
-    // motes stay evenly spread, so a gap reads as material thinning out instead
-    // of a suspiciously empty band.
     float across = clamp((radius - uInner) / max(uOuter - uInner, 1e-4), 0.0, 1.0);
     float ringlets = 1.0 - uBandDepth * 0.5 * (1.0 + sin(across * uBandFreq * 6.2831853));
     float division = smoothstep(uGapWidth, 0.0, abs(across - uGap));
@@ -97,8 +88,6 @@ const fragmentShader = /* glsl */ `
     gl_FragColor = vec4(vColor, 1.0);
     #include <colorspace_fragment>
 
-    // Fade folded into rgb: the canvas is premultiplied, so AdditiveBlending is
-    // blendFunc(ONE, ONE) and alpha stops scaling the colour.
     float alpha = mask * uOpacity;
     gl_FragColor = vec4(gl_FragColor.rgb * alpha, alpha);
   }

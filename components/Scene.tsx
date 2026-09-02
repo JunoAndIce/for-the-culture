@@ -6,19 +6,6 @@ import { useTexture } from "@react-three/drei";
 import WireframeSphere from "./WireframeSphere";
 import { maskUrlFor } from "@/lib/choreography";
 
-// Starts the mask fetch as soon as this module evaluates, rather than waiting
-// for the sphere to mount and suspend. The sphere is the first thing on the
-// page, so the gap between the two is the gap where there is no globe.
-//
-// Browser only, and not merely as an optimisation: TextureLoader reaches for
-// document.createElementNS, so on the server it throws. R3F runs loaders inside
-// a promise executor and caches the result through suspend-react, which turns
-// that throw into a cached rejected promise rather than a visible crash — the
-// build passes and the failure hides. Never call it where document is absent.
-//
-// Must resolve the URL exactly as WireframeSphere does, hence the shared
-// helper: preloading one mask while the sphere asks for another would fetch
-// both and wait on the slower one.
 if (typeof document !== "undefined") {
   useTexture.preload(maskUrlFor(window.innerWidth));
 }

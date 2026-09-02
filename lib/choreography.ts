@@ -46,16 +46,9 @@ export type Layout = "desktop" | "mobile";
 /** Matches Tailwind's `md`. Keep these in sync. */
 export const BREAKPOINT_MD = 768;
 
-/** Panels opt in explicitly, so unrelated <section> tags can't shift the timing. */
 export const PANEL_SELECTOR = "[data-panel]";
 
 export const SPHERE_PATH: Record<Layout, SphereState[]> = {
-  // Beside the copy: right on panel one, left on panel two.
-  //
-  // The tilt leans through the middle of the page and unwinds to nothing on
-  // the globe panel, so the sphere arrives upright and square to the viewer
-  // just as it becomes something to handle, then leans off again for the work.
-  // That panel is also the only one that lights the halo — see `glow`.
   desktop: [
     {
       x: 1.5,
@@ -265,10 +258,7 @@ export const SPHERE_SEGMENTS: Record<Layout, [number, number]> = {
   mobile: [32, 16],
 };
 
-/**
- * Wireframe colour per theme. A white mesh is invisible on a light
- * background, so the lines invert with the theme.
- */
+
 export const SPHERE_COLOR: Record<"light" | "dark", string> = {
   light: "#000000",
   dark: "#ffffff",
@@ -283,16 +273,6 @@ export function maskUrlFor(width: number) {
   return width >= BREAKPOINT_MD ? SPHERE_MASK.desktop : SPHERE_MASK.mobile;
 }
 
-/**
- * The globe is two layers on one sphere: solid landmasses, and the wire
- * lattice over them that gives the shape an outline. They have to be separate
- * meshes because one material cannot be both filled and wireframe.
- *
- * Each layer's share of whatever opacity the current panel calls for. The land
- * carries the globe; the wire is structure drawn on top and reads heavier than
- * the land at matching values, so it runs lighter. Set `wire` to 0 for solid
- * continents alone, or `land` to 0 for the bare lattice the site had before.
- */
 export const SPHERE_LAYER_OPACITY = {
   land: 2,
   wire: 0.09,
@@ -309,16 +289,9 @@ export const GLOBE_GLOW = {
   spread: 0.07,
   /** Gaussian depth through the screen, in globe radii. */
   thickness: 0.07,
-  /** Hard inner limit, keeping the Gaussian's tail off the globe's face. */
   floor: 1.09,
-  /** Lean in radians. 0 is face-on; ~1.15 reads as Saturn, past 1.4 is a line. */
   tilt: 0,
-  /** Mote size in CSS pixels. */
   size: 1.5,
-  /**
-   * Ring-system profile, off by default so every panel keeps the soft halo.
-   * Panel one turns it on: see SPHERE_PATH.
-   */
   disc: 0,
   inner: 1.25,
   outer: 2,
@@ -326,12 +299,7 @@ export const GLOBE_GLOW = {
   gapWidth: 0.05,
   bandFreq: 6,
   bandDepth: 0.35,
-  /** Brightness weighting toward the dim end. Baked, so not per-panel. */
-  contrast: 1.7,
-  /**
-   * Ceiling on brightness, before a panel's own `glow` scales it down. Mobile
-   * runs dimmer, since the ring covers far more of a portrait viewport.
-   */
+  contrast: 1.1,
   intensity: { desktop: 2, mobile: 1 } as Record<Layout, number>,
   /** Radians per second the ring turns in its own plane. */
   drift: 0.03,
