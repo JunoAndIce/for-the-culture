@@ -155,33 +155,31 @@ function buildTimeline(
 function usePanelSnap() {
   useGSAP(() => {
     const mm = gsap.matchMedia();
-    // No snap under reduced motion; moving the page unasked is the whole point.
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
-      const panels = gsap.utils.toArray<HTMLElement>(PANEL_SELECTOR);
-      if (panels.length < 2) return;
-      const tops = panels.map((el) => el.offsetTop);
-      const span = tops[tops.length - 1] - tops[0];
-      if (span <= 0) return;
+    mm.add(
+      `(min-width: ${BREAKPOINT_MD}px) and (prefers-reduced-motion: no-preference)`,
+      () => {
+        const panels = gsap.utils.toArray<HTMLElement>(PANEL_SELECTOR);
+        if (panels.length < 2) return;
+        const tops = panels.map((el) => el.offsetTop);
+        const span = tops[tops.length - 1] - tops[0];
+        if (span <= 0) return;
 
-      ScrollTrigger.create({
-        trigger: panels[0],
-        start: "top top",
-        markers: false,
-        endTrigger: panels[panels.length - 1],
-        end: "top top",
-        snap: {
-          // Real panel tops, not an even increment, so a panel taller than the
-          // viewport still lands square.
-          snapTo: tops.map((top) => (top - tops[0]) / span),
-          duration: { min: 0.5, max: 1.9 },
-          delay: 0.2,
-          ease: "power2.inOut",
-          // Nearest stop, not the one you were heading for: a stray pixel of
-          // scroll should never carry the reader to the next panel.
-          directional: true,
-        },
-      });
-    });
+        ScrollTrigger.create({
+          trigger: panels[0],
+          start: "top top",
+          markers: false,
+          endTrigger: panels[panels.length - 1],
+          end: "top top",
+          snap: {
+            snapTo: tops.map((top) => (top - tops[0]) / span),
+            duration: { min: 0.5, max: 1.9 },
+            delay: 0.2,
+            ease: "power2.inOut",
+            directional: true,
+          },
+        });
+      },
+    );
   }, []);
 }
 
