@@ -1,11 +1,10 @@
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+"use client";
 
-/**
- * Placeholder work. The three clients are the ones already quoted in
- * Testimonials, so the two panels read as the same agency rather than two
- * unrelated lists of names.
- */
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+
+// Placeholder work. The three clients are the ones already quoted in
+// Testimonials, so the two panels read as the same agency.
 const PROJECTS = [
   {
     slug: "kyro-bros",
@@ -14,12 +13,9 @@ const PROJECTS = [
     summary:
       "A logistics startup with three trucks and no name. We built the brand, the booking flow, and the dispatch playbook their team still runs on.",
     badges: ["Branding", "Next.js", "Design System", "Copywriting"],
-    facts: [
-      { label: "Year", value: "2025" },
-      { label: "Timeline", value: "11 weeks" },
-      { label: "Scope", value: "End to end" },
-      { label: "Outcome", value: "4x booking volume" },
-    ],
+    year: "2025",
+    build: "11 wks",
+    outcome: "4x booking volume",
     motif: "orbit",
   },
   {
@@ -29,12 +25,9 @@ const PROJECTS = [
     summary:
       "Research tooling that needed to read as a product, not a paper. We found the story first, then built the site their sales team still leads with.",
     badges: ["Positioning", "Web Design", "Motion", "Analytics"],
-    facts: [
-      { label: "Year", value: "2024" },
-      { label: "Timeline", value: "6 weeks" },
-      { label: "Scope", value: "Strategy and build" },
-      { label: "Outcome", value: "Launched on schedule" },
-    ],
+    year: "2024",
+    build: "6 wks",
+    outcome: "Launched on schedule",
     motif: "contour",
   },
   {
@@ -44,22 +37,17 @@ const PROJECTS = [
     summary:
       "A twenty-year-old fabricator modernising without losing the shop-floor voice. We rebuilt the identity, then taught them to run it themselves.",
     badges: ["Identity", "Print", "Art Direction", "Enablement"],
-    facts: [
-      { label: "Year", value: "2024" },
-      { label: "Timeline", value: "9 weeks" },
-      { label: "Scope", value: "Identity and docs" },
-      { label: "Outcome", value: "No retainer needed" },
-    ],
+    year: "2024",
+    build: "9 wks",
+    outcome: "No retainer needed",
     motif: "stack",
   },
 ] as const;
 
 type Project = (typeof PROJECTS)[number];
 
-/**
- * One line-art figure per project, so switching visibly changes the frame
- * rather than swapping one grey box for an identical one.
- */
+// One line-art figure per project, so switching visibly changes the frame
+// rather than swapping one grey box for an identical one.
 const MOTIFS = {
   orbit: (
     <>
@@ -96,9 +84,7 @@ const MOTIFS = {
  * which is what supplies the frame and the aspect ratio.
  */
 function ProjectImage({ project, index }: { project: Project; index: number }) {
-  // Pattern ids are document-global. Radix only mounts the active panel today,
-  // so nothing would collide, but that is a default rather than a guarantee —
-  // forceMount would put all three in the document at once.
+  // Pattern ids are document-global; only the open project is rendered.
   const gridId = `${project.slug}-grid`;
 
   return (
@@ -145,117 +131,149 @@ function ProjectImage({ project, index }: { project: Project; index: number }) {
 }
 
 export default function Projects() {
+  const [open, setOpen] = useState(0);
+  const project = PROJECTS[open];
+
   return (
     <section data-panel className="grid min-h-screen p-8 md:p-16 xl:p-24">
-      <div className="flex min-w-0 flex-col justify-center items-center">
-        <h2 className="flex items-center justify-center gap-4 text-2xl font-extralight tracking-widest uppercase md:gap-6 md:text-5xl">
-          <span
-            aria-hidden="true"
-            className="shrink-0 text-sm text-foreground/40 select-none"
-          >
-            &bull;
-          </span>
-          <span>What We&apos;ve Built</span>
-          <span
-            aria-hidden="true"
-            className="shrink-0 text-sm text-foreground/40 select-none"
-          >
-            &bull;
-          </span>
-        </h2>
-        <p className="text-center mt-5 max-w-2xl text-xs leading-relaxed font-bold text-foreground/70 md:mt-8 md:text-lg">
-          Brick by brick, we build for sustainable growth, not a one-off launch. These are the projects that
-          have grown into long-term partnerships, and the work that has outlived us.
-        </p>
-        {/*
-         * Three tracks, not two. The index occupies the first, the work the
-         * second, and the third is empty and exactly as wide as the first —
-         * that phantom column is what keeps the work centred under the heading
-         * instead of being shoved right by the width of the index.
-         *
-         * Below lg the sidebar would leave the middle track too narrow to hold
-         * a 16:9 frame, so the index stacks above the work instead.
-         */}
-        <Tabs
-          orientation="vertical"
-          defaultValue={PROJECTS[0].slug}
-          className="mt-8 w-full min-w-0 max-lg:flex-col md:mt-12 lg:grid lg:grid-cols-[13rem_minmax(0,48rem)_13rem] lg:justify-center lg:gap-x-10"
-        >
-          <TabsList
-            variant="line"
-            className="w-full items-stretch gap-1 max-lg:flex-row! lg:col-start-1 lg:row-start-1 lg:gap-2"
-          >
-            {PROJECTS.map((project, i) => (
-              <TabsTrigger
-                key={project.slug}
-                value={project.slug}
-                className="w-full gap-3 py-2 text-xs tracking-widest uppercase max-lg:w-auto! max-lg:justify-center! max-lg:whitespace-normal! max-lg:after:hidden max-lg:before:absolute max-lg:before:inset-x-0 max-lg:before:bottom-[-5px] max-lg:before:h-0.5 max-lg:before:origin-center max-lg:before:scale-x-0 max-lg:before:bg-foreground max-lg:before:transition-transform max-lg:before:duration-300 max-lg:data-active:before:scale-x-100 motion-reduce:before:transition-none"
-              >
-                <span className="text-foreground/40 tabular-nums max-lg:hidden">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span>{project.name}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
+      {/* Column right, because the sphere and its ring sit far left on this
+          pose (SPHERE_PATH desktop index 4), as on the Services panel. */}
+      <div className="flex min-w-0 flex-col justify-center md:items-end">
+        <div className="flex w-full min-w-0 flex-col items-start text-left md:mr-12 md:max-w-4xl">
+          <p className="font-mono text-[0.65rem] tracking-[0.35em] text-red-700 uppercase md:text-xs dark:text-red-500">
+            Selected work
+          </p>
 
-          {PROJECTS.map((project, i) => (
-            <TabsContent
-              key={project.slug}
-              value={project.slug}
-              // min-h keeps the page from reflowing as you switch projects.
-              className="mx-auto w-full max-w-3xl min-w-0 md:min-h-80 lg:col-start-2 lg:row-start-1"
-            >
-              {/*
-               * Image leads, details read underneath it. The column is capped
-               * on TabsContent rather than filling the panel: a 16:9 frame
-               * spanning a wide viewport would be taller than the screen it
-               * sits in, and would push the facts below the fold.
-               */}
-              <div className="grid min-w-0 gap-6">
-                <ProjectImage project={project} index={i} />
+          <h2 className="mt-3 text-[clamp(1.6rem,3.6vw,2.75rem)] leading-[1.08] font-bold tracking-tight text-balance">
+            <span>Brick by brick, not launch by launch.</span>{" "}
+            <span className="text-foreground/50">
+              Three businesses that still run on what we built with them.
+            </span>
+          </h2>
 
-                <div className="flex min-w-0 flex-col">
-                  <h3 className="text-lg tracking-widest uppercase md:text-2xl">
-                    {project.name}
-                  </h3>
-                  <p className="mt-1 text-xs tracking-widest text-foreground/50 uppercase">
-                    {project.discipline}
-                  </p>
+          <p className="mt-4 max-w-xl font-mono text-xs leading-relaxed text-foreground/70 md:text-sm">
+            We build for the second year, not the first week. Every project here
+            ended with the client able to run the thing themselves.
+          </p>
 
-                  <p className="mt-4 text-sm leading-relaxed font-light text-foreground/80">
-                    {project.summary}
-                  </p>
+          <div className="mt-7 grid w-full min-w-0 gap-6 border-t border-foreground/15 pt-7 md:grid-cols-2 md:gap-10">
+            <ProjectImage project={project} index={open} />
 
-                  <div className="mt-4 flex flex-wrap gap-1.5">
-                    {project.badges.map((badge) => (
-                      <Badge
-                        key={badge}
-                        variant="outline"
-                        className="border-foreground/25 tracking-widest text-foreground/70 uppercase"
-                      >
-                        {badge}
-                      </Badge>
-                    ))}
-                  </div>
+            <div className="flex min-w-0 flex-col">
+              <h3 className="text-lg tracking-widest uppercase md:text-2xl">
+                {project.name}
+              </h3>
+              <p className="mt-1 font-mono text-[0.6rem] tracking-[0.16em] text-foreground/50 uppercase md:text-[0.65rem]">
+                {project.discipline}
+              </p>
 
-                  <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-foreground/15 pt-4 sm:grid-cols-4">
-                    {project.facts.map((fact) => (
-                      <div key={fact.label}>
-                        <dt className="text-[0.65rem] tracking-widest text-foreground/45 uppercase">
-                          {fact.label}
-                        </dt>
-                        <dd className="mt-0.5 text-xs text-foreground/80 md:text-sm">
-                          {fact.value}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
+              <p className="mt-3 font-gelasio text-sm leading-relaxed text-foreground/70 md:text-base">
+                {project.summary}
+              </p>
+
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {project.badges.map((badge) => (
+                  <Badge
+                    key={badge}
+                    variant="outline"
+                    className="border-foreground/25 tracking-widest text-foreground/70 uppercase"
+                  >
+                    {badge}
+                  </Badge>
+                ))}
               </div>
-            </TabsContent>
-          ))}
-        </Tabs>
+
+              {/* Three facts, one of them the point — so only that one takes
+                  the accent. mt-auto drops the row to the frame's baseline. */}
+              <dl className="mt-5 grid grid-cols-3 gap-x-6 border-t border-foreground/15 pt-4 md:mt-auto">
+                <div>
+                  <dt className="font-mono text-[0.55rem] tracking-[0.18em] text-foreground/45 uppercase">
+                    Year
+                  </dt>
+                  <dd className="mt-0.5 text-xs tabular-nums md:text-sm">
+                    {project.year}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-mono text-[0.55rem] tracking-[0.18em] text-foreground/45 uppercase">
+                    Build
+                  </dt>
+                  <dd className="mt-0.5 text-xs tabular-nums md:text-sm">
+                    {project.build}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-mono text-[0.55rem] tracking-[0.18em] text-foreground/45 uppercase">
+                    Outcome
+                  </dt>
+                  <dd className="mt-0.5 text-xs text-red-700 md:text-sm dark:text-red-500">
+                    {project.outcome}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+
+          {/* Every project stays on the surface, and a closed one still carries
+              its outcome — the fact that would make someone open it. */}
+          <ul className="mt-7 w-full border-t border-foreground/15">
+            {PROJECTS.map((p, i) => (
+              <li key={p.slug}>
+                <button
+                  type="button"
+                  onClick={() => setOpen(i)}
+                  aria-current={i === open}
+                  className="grid w-full grid-cols-[auto_1fr_auto] items-baseline gap-x-4 border-b border-foreground/15 py-3 text-left transition-colors hover:border-foreground/40 aria-current:border-red-700 md:grid-cols-[auto_11rem_1fr_auto] md:gap-x-6 dark:aria-current:border-red-500"
+                >
+                  <span
+                    className={`font-mono text-[0.6rem] tracking-[0.16em] tabular-nums ${
+                      i === open
+                        ? "text-red-700 dark:text-red-500"
+                        : "text-foreground/40"
+                    }`}
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span
+                    className={`text-[0.7rem] tracking-widest uppercase md:text-xs ${
+                      i === open ? "text-foreground" : "text-foreground/60"
+                    }`}
+                  >
+                    {p.name}
+                  </span>
+                  <span className="col-span-2 col-start-2 font-mono text-[0.58rem] tracking-widest text-foreground/45 uppercase md:col-span-1 md:col-start-3">
+                    {p.outcome}
+                  </span>
+                  <span
+                    className={`col-start-3 row-start-1 font-mono text-[0.55rem] tracking-[0.16em] uppercase md:col-start-4 ${
+                      i === open
+                        ? "text-red-700 dark:text-red-500"
+                        : "text-foreground/40"
+                    }`}
+                  >
+                    {i === open ? "Open" : "View"}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          {/* The last panel before the footer carries the closing ask. */}
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <a
+              href="#"
+              className="rounded-lg bg-foreground px-6 py-3 text-xs tracking-widest text-background uppercase transition-colors hover:bg-foreground/80"
+            >
+              Start a project
+            </a>
+            <a
+              href="#"
+              className="rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10"
+            >
+              See the full archive
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   );
