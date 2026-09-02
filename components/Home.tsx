@@ -9,40 +9,50 @@ export default function Home() {
       className="grid min-h-screen grid-rows-[1fr_auto] p-8 md:p-16 xl:p-24"
     >
       <div className="flex flex-col items-center justify-center text-center md:items-start md:text-left">
-        <p className="font-script text-[clamp(3.5rem,11vw,16rem)] leading-none">
+        {/* Above the mark, not under it: underneath it read as a caption for
+            the script rather than as the company's name. */}
+        <p className="font-mono text-[0.6rem] tracking-[0.34em] text-foreground/60 uppercase md:text-xs">
+          FTC Enterprises &middot; Texas
+        </p>
+
+        <p className="mt-2 font-script text-[clamp(3.5rem,11vw,16rem)] leading-none">
           For the Culture
         </p>
-        <p className="text-xs md:text-2xl font-black uppercase mt-4 md:mt-0">
-          FTC Enterprises
-        </p>
-        <p className="text-lg md:text-4xl font-light uppercase mt-0 md:mt-4">
+
+        <p className="mt-1 text-lg font-light uppercase md:mt-3 md:text-4xl">
           Let us build your{" "}
-          <ScrambleWord words={VISION_WORDS} className="text-red-700" />{" "}
+          <ScrambleWord
+            words={VISION_WORDS}
+            className="text-red-700 dark:text-red-500"
+          />{" "}
           together.
         </p>
-        <p className="text-xs md:text-sm font-light uppercase md:w-[75ch] mt-4 md:mt-8">
-          For The Culture is a full-service creative agency specializing in web
-          design, branding, and digital marketing. We help businesses and
-          individuals bring their ideas to life through innovative design and
-          strategic marketing solutions.
+
+        {/* Who this is for. The old copy listed the services, which the
+            Services panel now does properly one screen later. */}
+        <p className="mt-4 max-w-xl font-mono text-xs leading-relaxed text-foreground/70 md:mt-6 md:text-sm">
+          A creative and marketing agency for small and Black-owned businesses
+          getting off the ground. Everything under one roof, so you only ever
+          have one number to call.
         </p>
 
         <div className="mt-6 flex flex-wrap justify-center gap-4 md:mt-8 md:justify-start">
           <a
             href="#"
-            className="rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10"
+            className="rounded-lg bg-foreground px-6 py-3 text-xs tracking-widest text-background uppercase transition-colors hover:bg-foreground/80"
           >
-            Learn More
+            Join us
           </a>
           <a
             href="#"
-            className="rounded-lg bg-foreground px-6 py-3 text-xs tracking-widest text-background uppercase transition-colors hover:bg-foreground/80"
+            className="rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10"
           >
-            Join Us
+            See what we do
           </a>
         </div>
       </div>
 
+      {/* Right side stays empty: the scroll chevron is fixed in that corner. */}
       <div className="flex items-end justify-between gap-4">
         <address className="text-xs leading-relaxed text-foreground/60 not-italic">
           Based in Texas
