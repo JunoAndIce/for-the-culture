@@ -1,66 +1,8 @@
-import {
-  ArrowRight,
-  ChartLine,
-  MonitorPlay,
-  Palette,
-  Radio,
-  Search,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+
 import ScriptReveal from "@/components/ScriptReveal";
-
-const SERVICES = [
-  {
-    icon: Radio,
-    name: "Traditional Media",
-    body: "Radio, print, and out-of-home. The buys that still own a neighbourhood.",
-  },
-  {
-    icon: MonitorPlay,
-    name: "Digital Media",
-    body: "Paid social, video, and display, put in front of the people most likely to buy.",
-  },
-  {
-    icon: Search,
-    name: "Search & SEO",
-    body: "Turn up first when somebody nearby searches for what you already sell.",
-  },
-  {
-    icon: Palette,
-    name: "Branding & Design",
-    body: "Name, mark, packaging, and a look that survives contact with the real world.",
-  },
-  {
-    icon: ChartLine,
-    name: "Strategy & Research",
-    body: "Who your customer is, what moves them, and what the last dollar brought back.",
-  },
-] as const;
-
-// The way in. Numbered because it is a real sequence, and step one costs nothing.
-const STEPS = [
-  {
-    n: "01",
-    title: "Tell us where you are",
-    body: "One call. No deck, no budget figure required.",
-  },
-  {
-    n: "02",
-    title: "We map it out",
-    body: "What to do first, what it costs, what it should bring back.",
-  },
-  {
-    n: "03",
-    title: "We run it",
-    body: "Built and managed in-house, with the numbers open to you throughout.",
-  },
-] as const;
-
-// Proof on one line. The stat grid this replaces cost a third of the panel.
-const PROOF = [
-  "40+ brands launched",
-  "9-week median build",
-  "100% founder owned",
-] as const;
+import { PROOF, SERVICES, STEPS } from "@/lib/services";
 
 export default function Services() {
   return (
@@ -77,27 +19,26 @@ export default function Services() {
 
           <h2 className="mt-3 text-[clamp(1.6rem,3.6vw,2.75rem)] leading-[1.08] font-bold tracking-tight text-balance">
             <span>
-              Agency work for the businesses the agencies never called.
+              Why are you waiting? Let&apos;s start that project now.
             </span>{" "}
             <span className="text-foreground/50">
-              You bring the business. We bring the studio, the airtime, and the
-              plan behind both.
+              All the resources you will ever need, provided and managed by our team.
             </span>
           </h2>
 
           <p className="mt-4 max-w-xl font-mono text-xs leading-relaxed text-foreground/70 md:text-sm">
-            Five services, one team. No matter where you start from, we're here to help you get seen, and get found.
-            It's time to stop worrying about the small stuff, and move onto the bigger picture: your business, your brand, and your legacy.
+            <strong>For the Culture</strong> is commited to building a foundation for all small businesses around the world. Based in Houston, Texas, we provide all the necessary
+            tools needed to succeed in a competitive market today. Come and see our work, and see what we have in store. <strong>For the Culture</strong> is here to build a legacy.
           </p>
 
           {/* A ruled list, not a card grid: five does not divide into columns,
               and the rows let the name and its plain-English line share a
               baseline that can be scanned in a breath. */}
           <ul className="mt-7 w-full border-t border-foreground/15">
-            {SERVICES.map(({ icon: Icon, name, body }) => (
-              <li key={name}>
-                <a
-                  href="#"
+            {SERVICES.map(({ slug, icon: Icon, name, body }) => (
+              <li key={slug}>
+                <Link
+                  href={`/overview#${slug}`}
                   className="group grid grid-cols-[auto_1fr_auto] items-center gap-x-4 border-b border-foreground/15 py-3 transition-colors hover:border-foreground/40 md:grid-cols-[auto_13rem_1fr_auto] md:gap-x-6"
                 >
                   <Icon
@@ -116,7 +57,7 @@ export default function Services() {
                     strokeWidth={1.6}
                     className="col-start-3 row-start-1 size-4 shrink-0 text-foreground/30 transition-transform group-hover:translate-x-1 motion-reduce:transition-none md:col-start-4"
                   />
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

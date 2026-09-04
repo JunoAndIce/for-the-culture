@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { NAV_ITEMS } from "@/lib/nav";
 
 /**
@@ -23,13 +25,13 @@ export default function Footer() {
         <nav aria-label="Footer">
           <ul className="grid grid-cols-2 gap-x-12 gap-y-3 text-xs tracking-widest uppercase sm:grid-cols-3">
             {NAV_ITEMS.map((item) => (
-              <li key={item}>
-                <a
-                  href="#"
+              <li key={item.label}>
+                <Link
+                  href={item.href}
                   className="whitespace-nowrap text-foreground/70 transition-colors hover:text-foreground"
                 >
-                  {item}
-                </a>
+                  {item.label}
+                </Link>
               </li>
             ))}
           </ul>

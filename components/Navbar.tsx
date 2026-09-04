@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 import ThemeToggle from "@/components/ThemeToggle";
@@ -15,7 +16,7 @@ export default function Navbar() {
           {/* Desktop: the options, dotted, on the left. */}
           <ul className="hidden flex-wrap items-center text-[0.65rem] tracking-widest uppercase md:flex md:text-xs">
             {NAV_ITEMS.map((item, i) => (
-              <li key={item} className="flex items-center">
+              <li key={item.label} className="flex items-center">
                 {i > 0 && (
                   <span
                     aria-hidden="true"
@@ -24,12 +25,12 @@ export default function Navbar() {
                     &bull;
                   </span>
                 )}
-                <a
-                  href="#"
+                <Link
+                  href={item.href}
                   className="text-foreground/70 transition-colors hover:text-foreground"
                 >
-                  {item}
-                </a>
+                  {item.label}
+                </Link>
               </li>
             ))}
           </ul>
@@ -69,14 +70,14 @@ export default function Navbar() {
           className={`${open ? "flex" : "hidden"} flex-col gap-3 border-t border-foreground/10 pt-3 mt-2 text-xs tracking-widest uppercase md:hidden`}
         >
           {NAV_ITEMS.map((item) => (
-            <li key={item}>
-              <a
-                href="#"
+            <li key={item.label}>
+              <Link
+                href={item.href}
                 onClick={() => setOpen(false)}
                 className="text-foreground/70 transition-colors hover:text-foreground"
               >
-                {item}
-              </a>
+                {item.label}
+              </Link>
             </li>
           ))}
         </ul>
