@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
-import { Gelasio, Geist, Geist_Mono, Inter, Italianno } from "next/font/google";
+import {
+  Alex_Brush,
+  Gelasio,
+  Geist,
+  Geist_Mono,
+  Inter,
+  Italianno,
+} from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
@@ -26,6 +33,13 @@ const inter = Inter({
 const gelasio = Gelasio({
   variable: "--font-gelasio-serif",
   subsets: ["latin"],
+});
+
+// The FTC mark. Named *-script for the same reason as the fonts above.
+const alexBrush = Alex_Brush({
+  variable: "--font-alex-brush-script",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 const italianno = Italianno({
@@ -59,7 +73,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${gelasio.variable} ${italianno.variable} ${cochocib.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${gelasio.variable} ${italianno.variable} ${alexBrush.variable} ${cochocib.variable}`}
     >
       <body className="antialiased">
         <ThemeProvider
