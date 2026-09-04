@@ -33,7 +33,7 @@ export default function OverviewPage() {
           </p>
 
           <h1 className="mt-3 text-[clamp(1.9rem,4.4vw,3.25rem)] leading-[1.06] font-bold tracking-tight text-balance">
-            <span>We focus on what's important.</span>{" "}
+            <span>We focus on what&apos;s important.</span>{" "}
             <span className="text-foreground/50">
               From physical media to SEO, we make sure each part of your outreach is covered.
             </span>
@@ -41,7 +41,7 @@ export default function OverviewPage() {
 
           <p className="mt-5 max-w-2xl font-mono text-xs leading-relaxed text-foreground/70 md:text-sm">
             Nothing here is subcontracted out and marked up. The people who plan
-            the work are the people who run it. We have teams for all types of media, if you're
+            the work are the people who run it. We have teams for all types of media, if you&apos;re
             lacking in a department, we can cover for you.
           </p>
 
