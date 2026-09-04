@@ -31,7 +31,7 @@ export default function Home() {
         {/* Who this is for. The old copy listed the services, which the
             Services panel now does properly one screen later. */}
         <p className="mt-4 max-w-xl font-mono text-xs leading-relaxed text-foreground/70 md:mt-6 md:text-sm">
-          A creative and marketing agency for small and Black-owned businesses
+          A creative and marketing agency for small businesses
           getting off the ground. Everything under one roof, so you only ever
           have one number to call.
         </p>
