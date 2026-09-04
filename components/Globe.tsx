@@ -25,8 +25,6 @@ export default function Globe() {
         />
       </div>
 
-      <GlobeKey />
-
       <h2 className="relative flex items-center justify-center gap-4 text-2xl font-extralight tracking-widest uppercase md:gap-6 md:text-5xl md:mt-8 mt-12 text-center">
         <span
           aria-hidden="true"
@@ -43,15 +41,8 @@ export default function Globe() {
         </span>
       </h2>
 
-      <div className="relative row-start-3 flex flex-col items-center gap-4 text-center">
-        <p className="max-w-2xl text-xs leading-relaxed font-bold text-foreground/70 md:text-lg">
-          Our partners run out of Lagos, Lisbon, and Little Rock. The work
-          travels further than we do, and it is meant to.
-        </p>
-        <p className="text-[0.65rem] tracking-[0.3em] text-foreground/50 uppercase md:text-xs">
-          Drag to spin the globe
-        </p>
-      </div>
+      {/* The key, the pins, and the caption that steps aside for them. */}
+      <GlobeKey />
     </section>
   );
 }

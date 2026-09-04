@@ -14,6 +14,7 @@ export default function GlobeKey() {
   const root = useRef<HTMLDivElement>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const [inView, setInView] = useState(false);
+  const clearOpen = useRef<number | null>(null);
 
   // Pins are viewport-fixed, because the canvas behind them is. Without this
   // gate they would float over every other panel.
@@ -27,11 +28,22 @@ export default function GlobeKey() {
         end: "bottom 70%",
         onToggle: (self) => {
           setInView(self.isActive);
-          if (!self.isActive) setOpenId(null);
+          if (clearOpen.current) window.clearTimeout(clearOpen.current);
+          // Keep the selection alive for the fade, so an open dialog leaves
+          // with the key rather than blinking out ahead of it.
+          if (!self.isActive)
+            clearOpen.current = window.setTimeout(() => setOpenId(null), 300);
         },
       });
     },
     { scope: root },
+  );
+
+  useEffect(
+    () => () => {
+      if (clearOpen.current) window.clearTimeout(clearOpen.current);
+    },
+    [],
   );
 
   useEffect(() => {
@@ -139,6 +151,22 @@ export default function GlobeKey() {
             ))}
           </div>
         </nav>
+      </div>
+
+      {/* Mobile only: lifted clear of the key row, and out of its way while
+          a waypoint is open. The desktop column never reaches down here. */}
+      <div className="relative row-start-3 mb-12 flex flex-col items-center gap-4 text-center max-lg:pointer-events-none lg:mb-0">
+        <p
+          className={`max-w-2xl text-xs leading-relaxed font-bold text-foreground/70 transition-opacity duration-300 motion-reduce:transition-none md:text-lg ${
+            openId ? "max-lg:opacity-0" : ""
+          }`}
+        >
+          Our partners run out of Lagos, Lisbon, and Little Rock. The work
+          travels further than we do, and it is meant to.
+        </p>
+        <p className="text-[0.65rem] tracking-[0.3em] text-foreground/50 uppercase md:text-xs">
+          Drag to spin the globe
+        </p>
       </div>
     </div>
   );
