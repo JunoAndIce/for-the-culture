@@ -1,134 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+
+import ProjectImage from "@/components/ProjectImage";
 import { Badge } from "@/components/ui/badge";
-
-// Placeholder work. The three clients are the ones already quoted in
-// Testimonials, so the two panels read as the same agency.
-const PROJECTS = [
-  {
-    slug: "kyro-bros",
-    name: "Kyro & Bros.",
-    discipline: "Brand system, storefront, ops handover",
-    summary:
-      "A logistics startup with three trucks and no name. We built the brand, the booking flow, and the dispatch playbook their team still runs on.",
-    badges: ["Branding", "Next.js", "Design System", "Copywriting"],
-    year: "2025",
-    build: "11 wks",
-    outcome: "4x booking volume",
-    motif: "orbit",
-  },
-  {
-    slug: "halcyon-labs",
-    name: "Halcyon",
-    discipline: "Positioning and launch site",
-    summary:
-      "Research tooling that needed to read as a product, not a paper. We found the story first, then built the site their sales team still leads with.",
-    badges: ["Positioning", "Web Design", "Motion", "Analytics"],
-    year: "2024",
-    build: "6 wks",
-    outcome: "Launched on schedule",
-    motif: "contour",
-  },
-  {
-    slug: "copperline",
-    name: "Copperline",
-    discipline: "Identity refresh and enablement",
-    summary:
-      "A twenty-year-old fabricator modernising without losing the shop-floor voice. We rebuilt the identity, then taught them to run it themselves.",
-    badges: ["Identity", "Print", "Art Direction", "Enablement"],
-    year: "2024",
-    build: "9 wks",
-    outcome: "No retainer needed",
-    motif: "stack",
-  },
-] as const;
-
-type Project = (typeof PROJECTS)[number];
-
-// One line-art figure per project, so switching visibly changes the frame
-// rather than swapping one grey box for an identical one.
-const MOTIFS = {
-  orbit: (
-    <>
-      <circle cx="160" cy="90" r="58" />
-      <ellipse cx="160" cy="90" rx="58" ry="20" />
-      <ellipse cx="160" cy="90" rx="22" ry="58" />
-    </>
-  ),
-  contour: (
-    <>
-      {[0, 1, 2, 3, 4].map((i) => (
-        <path
-          key={i}
-          d={`M-10 ${50 + i * 22} C 90 ${10 + i * 22} 230 ${94 + i * 22} 330 ${34 + i * 22}`}
-        />
-      ))}
-    </>
-  ),
-  stack: (
-    <>
-      {[0, 1, 2, 3].map((i) => (
-        <rect key={i} x={62 + i * 18} y={26 + i * 12} width="140" height="86" />
-      ))}
-    </>
-  ),
-} satisfies Record<Project["motif"], React.ReactNode>;
-
-/**
- * Stands in for the project's hero shot. Drawn rather than dropped in as a
- * grey box so an unfinished panel still looks composed, and drawn in
- * currentColor so it inverts with the theme like everything else here.
- *
- * To use a real asset: replace the <svg> with next/image and keep the wrapper,
- * which is what supplies the frame and the aspect ratio.
- */
-function ProjectImage({ project, index }: { project: Project; index: number }) {
-  // Pattern ids are document-global; only the open project is rendered.
-  const gridId = `${project.slug}-grid`;
-
-  return (
-    <div className="overflow-hidden rounded-lg border border-foreground/15 bg-foreground/5">
-      <svg
-        viewBox="0 0 320 180"
-        className="block w-full text-foreground"
-        role="img"
-        aria-label={`Placeholder artwork for ${project.name}`}
-      >
-        <defs>
-          <pattern
-            id={gridId}
-            width="16"
-            height="16"
-            patternUnits="userSpaceOnUse"
-          >
-            <path
-              d="M16 0H0v16"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="0.4"
-              opacity="0.3"
-            />
-          </pattern>
-        </defs>
-        <rect width="320" height="180" fill={`url(#${gridId})`} />
-        <g fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.45">
-          {MOTIFS[project.motif]}
-        </g>
-        <text
-          x="14"
-          y="166"
-          fill="currentColor"
-          fontSize="46"
-          fontWeight="900"
-          opacity="0.12"
-        >
-          {String(index + 1).padStart(2, "0")}
-        </text>
-      </svg>
-    </div>
-  );
-}
+import { PROJECTS } from "@/lib/work";
 
 export default function Projects() {
   const [open, setOpen] = useState(0);
@@ -137,7 +14,7 @@ export default function Projects() {
   return (
     <section data-panel className="grid min-h-screen p-8 md:p-16 xl:p-24">
       {/* Column right, because the sphere and its ring sit far left on this
-          pose (SPHERE_PATH desktop index 4), as on the Services panel. */}
+          pose (SPHERE_PATH desktop index 2), as on the Services panel. */}
       <div className="flex min-w-0 flex-col justify-center md:items-end">
         <div className="flex w-full min-w-0 flex-col items-start text-left md:mr-12 md:max-w-4xl">
           <p className="font-mono text-[0.65rem] tracking-[0.35em] text-red-700 uppercase md:text-xs dark:text-red-500">
@@ -258,7 +135,7 @@ export default function Projects() {
             ))}
           </ul>
 
-          {/* The last panel before the footer carries the closing ask. */}
+          {/* The ask, carried here rather than saved for the last panel. */}
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <a
               href="#"
@@ -266,12 +143,12 @@ export default function Projects() {
             >
               Start a project
             </a>
-            <a
-              href="#"
+            <Link
+              href="/affiliations"
               className="rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10"
             >
               See the full archive
-            </a>
+            </Link>
           </div>
         </div>
       </div>

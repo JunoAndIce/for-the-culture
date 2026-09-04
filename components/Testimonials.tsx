@@ -1,59 +1,12 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import Link from "next/link";
 
-// `since` is a checkable outcome, not a claim: a real number the client would
-// confirm on a call, or the line comes out. Never soften it.
-const TESTIMONIALS = [
-  {
-    quote:
-      "They took a name on a napkin and handed back a company. Brand, site, and filings done before our first customer call.",
-    name: "Marcus Reed",
-    role: "Founder, Reed & Co.",
-    since: "Second location open, 14 months from launch.",
-  },
-  {
-    quote:
-      "The only agency we've worked with that asked about our margins before our logo. It showed in everything after.",
-    name: "Alina Vasquez",
-    role: "COO, Northbound",
-    since: "Cost per lead halved in a quarter.",
-  },
-  {
-    quote:
-      "We launched in six weeks. The positioning work is still what our sales team leads with two years on.",
-    name: "Devon Blake",
-    role: "CEO, Halcyon Labs",
-    since: "Live in six weeks, same positioning two years on.",
-  },
-  {
-    quote:
-      "They built the thing, then taught us to run it. No lock-in, no retainer we didn't ask for.",
-    name: "Priya Raman",
-    role: "Director, Copperline",
-    since: "Running their own campaigns since month four.",
-  },
-  {
-    quote:
-      "Our first hire read the brand guide and knew what we stood for. That saved us a month of onboarding.",
-    name: "Theo Okafor",
-    role: "Partner, Vantage Group",
-    since: "Onboarding down from three weeks to four days.",
-  },
-] as const;
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { AFFILIATIONS, TESTIMONIALS } from "@/lib/work";
 
 // One voice gets the room; three support it. The rest wait for the full
 // stories page, which is what the second button goes to.
 const [FEATURED, ...REST] = TESTIMONIALS;
 const ROSTER = REST.slice(0, 3);
-
-/** Placeholder slots — swap the label for a logo <Image> as partners are signed. */
-const AFFILIATIONS = [
-  "Kyro & Bros.",
-  "HWY6 Studios",
-  "Halcyon Labs",
-  "Studio Meridian",
-  "Copperline",
-  "Vantage Group",
-] as const;
 
 const initials = (name: string) =>
   name
@@ -66,7 +19,7 @@ export default function Testimonials() {
   return (
     <section data-panel className="grid min-h-screen p-8 md:p-16 xl:p-24">
       {/* Left edge, full width: the sphere is pole-on and near-invisible on this
-          panel (SPHERE_PATH desktop index 2), so nothing has to make room. */}
+          panel (SPHERE_PATH desktop index 3), so nothing has to make room. */}
       <div className="flex min-w-0 flex-col justify-center">
         <div className="flex w-full max-w-6xl flex-col items-start text-left">
           {/* red-700 light, red-500 dark: the two steps that clear AA here. */}
@@ -147,12 +100,12 @@ export default function Testimonials() {
             >
               Ask them yourself
             </a>
-            <a
-              href="#"
+            <Link
+              href="/affiliations#voices"
               className="rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10"
             >
               Read the full stories
-            </a>
+            </Link>
             <p className="font-mono text-[0.65rem] tracking-[0.16em] text-foreground/45 uppercase md:hidden">
               {REST.length} more founders
             </p>
