@@ -1,3 +1,4 @@
+import Careers from "@/components/Careers";
 import Footer from "@/components/Footer";
 import Globe from "@/components/Globe";
 import Loader from "@/components/Loader";
@@ -20,9 +21,10 @@ export default function Page() {
       <main className="relative z-10">
         <Home />
         <Services />
+        <Projects />
         <Testimonials />
         <Globe />
-        <Projects />
+        <Careers />
       </main>
 
       <Footer />

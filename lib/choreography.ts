@@ -2,7 +2,8 @@
  * Where the sphere sits on each full-screen panel, per layout.
  *
  * To add a screen: add a <section data-panel> to app/page.tsx and append one
- * entry to BOTH paths below. Order must match document order.
+ * entry to BOTH paths below. Order must match document order — reordering the
+ * panels means reordering these with them, or a panel inherits the wrong pose.
  *
  * Index 0 is the sphere's starting state. Every later entry is the state it
  * animates to as that panel scrolls into view.
@@ -97,24 +98,6 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
       },
     },
     {
-      x: 0,
-      y: -0.3,
-      rotY: Math.PI * 0.1,
-      rotX: Math.PI * 0.5,
-      zoom: 2.5,
-      opacity: 0.02,
-    },
-    {
-      x: 0,
-      y: 0,
-      rotY: Math.PI * 1.5,
-      rotX: 0,
-      zoom: 0.8,
-      opacity: 1,
-      glow: 1,
-      ring: { spread: 0.1, floor: 1.06, tilt: 0 },
-    },
-    {
       x: -1.7,
       y: 0.25,
       rotY: Math.PI * 1.9,
@@ -136,6 +119,35 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
         bandFreq: 9,
         bandDepth: 0.55,
       },
+    },
+    {
+      x: 0,
+      y: -0.3,
+      rotY: Math.PI * 0.1,
+      rotX: Math.PI * 0.5,
+      zoom: 2.5,
+      opacity: 0.02,
+    },
+    {
+      x: 0,
+      y: 0,
+      rotY: Math.PI * 1.5,
+      rotX: 0,
+      zoom: 0.8,
+      opacity: 1,
+      glow: 1,
+      ring: { spread: 0.1, floor: 1.06, tilt: 0 },
+    },
+    // Careers: the sphere leaves to the right and dims out of the way.
+    {
+      x: 1.9,
+      y: -0.2,
+      rotY: Math.PI * 1.85,
+      rotX: Math.PI * 0.06,
+      zoom: 1.45,
+      opacity: 0.06,
+      glow: 0.4,
+      ring: { spread: 0.14, floor: 1.06, tilt: 0.25 },
     },
   ],
   mobile: [
@@ -187,6 +199,29 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
     },
     {
       x: 0,
+      y: 0.02,
+      rotY: Math.PI * 2,
+      rotX: Math.PI * 0.3,
+      zoom: 1.1,
+      opacity: 0.04,
+      glow: 1,
+      ring: {
+        tilt: 1.17,
+        radius: 1.45,
+        floor: 1.02,
+        thickness: 0.004,
+        size: 1.2,
+        disc: 1,
+        inner: 1.07,
+        outer: 1.44,
+        gap: 0.5,
+        gapWidth: 0.06,
+        bandFreq: 9,
+        bandDepth: 0.55,
+      },
+    },
+    {
+      x: 0,
       y: -0.9,
       rotY: Math.PI * 1.1,
       rotX: Math.PI * 0.1,
@@ -217,28 +252,15 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
       opacity: 1,
       glow: 1,
     },
+    // Careers: no room to send it sideways here, so it sinks and dims.
     {
       x: 0,
-      y: 0.02,
-      rotY: Math.PI * 2,
-      rotX: Math.PI * 0.3,
-      zoom: 1.1,
-      opacity: 0.04,
-      glow: 1,
-      ring: {
-        tilt: 1.17,
-        radius: 1.45,
-        floor: 1.02,
-        thickness: 0.004,
-        size: 1.2,
-        disc: 1,
-        inner: 1.07,
-        outer: 1.44,
-        gap: 0.5,
-        gapWidth: 0.06,
-        bandFreq: 9,
-        bandDepth: 0.55,
-      },
+      y: -1.05,
+      rotY: Math.PI * 1.85,
+      rotX: 0,
+      zoom: 1.25,
+      opacity: 0.05,
+      glow: 0.4,
     },
   ],
 };
@@ -257,7 +279,6 @@ export const SPHERE_SEGMENTS: Record<Layout, [number, number]> = {
   desktop: [64, 32],
   mobile: [32, 16],
 };
-
 
 export const SPHERE_COLOR: Record<"light" | "dark", string> = {
   light: "#000000",
