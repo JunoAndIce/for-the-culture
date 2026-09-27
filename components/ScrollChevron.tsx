@@ -46,7 +46,10 @@ export default function ScrollChevron() {
         aria-hidden="true"
         className="block animate-bounce text-foreground drop-shadow-[0_0_8px_var(--background)] motion-reduce:animate-none"
       >
+        {/* The intro fades the svg, not the wrapper: the wrapper's opacity is the
+            scrubbed fade below, and one property gets one writer. */}
         <svg
+          data-intro="cue"
           width="44"
           height="44"
           viewBox="0 0 24 24"

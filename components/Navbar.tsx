@@ -10,15 +10,15 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="fixed inset-x-0 top-0 z-20 p-4 md:p-6">
+    <nav data-intro="nav" className="fixed inset-x-0 top-0 z-20 p-4 md:p-6">
       <div className="mx-auto max-w-5xl rounded-lg border border-foreground/15 bg-neutral-100/20 px-4 py-2 shadow-lg shadow-black/20 backdrop-blur-md md:px-5 md:py-2.5 dark:bg-neutral-800/20">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 md:gap-5">
-            {/* The mark, in the brand script. Swap for an <Image> when there is one. */}
+            {/* The mark, in Inter Black. Swap for an <Image> when there is one. */}
             <Link
               href="/"
               aria-label="For the Culture — home"
-              className="shrink-0 px-1 font-alex text-3xl leading-none text-foreground transition-opacity hover:opacity-70 md:text-[2rem]"
+              className="shrink-0 px-1 font-inter text-3xl leading-none font-black text-foreground transition-opacity hover:opacity-70 md:text-[2rem]"
             >
               FTC
             </Link>
@@ -37,7 +37,7 @@ export default function Navbar() {
                   )}
                   <Link
                     href={item.href}
-                    className="text-foreground/70 transition-colors hover:text-foreground"
+                    className="relative text-foreground/70 transition-colors after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-red-700 after:transition-transform after:duration-300 after:content-[''] hover:text-foreground hover:after:scale-x-100 dark:after:bg-red-500"
                   >
                     {item.label}
                   </Link>

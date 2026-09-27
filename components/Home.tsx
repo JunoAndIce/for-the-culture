@@ -11,32 +11,46 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center text-center md:items-start md:text-left">
         {/* Above the mark, not under it: underneath it read as a caption for
             the script rather than as the company's name. */}
-        <p className="font-mono text-[0.6rem] tracking-[0.34em] text-foreground/60 uppercase md:text-xs">
-          FTC Enterprises &middot; Texas
+        <p
+          data-intro="eyebrow"
+          className="font-mono text-[0.6rem] tracking-[0.34em] text-foreground/60 uppercase md:text-xs"
+        >
+          FTC Enterprises &middot; Houston, TX
         </p>
 
-        <p className="mt-2 font-script text-[clamp(3.5rem,11vw,16rem)] leading-none">
+        <p
+          data-intro="wordmark"
+          className="mt-2 font-script text-[clamp(3.5rem,11vw,16rem)] leading-none"
+        >
           For the Culture
         </p>
 
-        <p className="mt-1 text-lg font-light uppercase md:mt-3 md:text-4xl">
+        {/* The plain answer to "what do you do," stated once, before the
+            flourish below gets a turn. */}
+        <p
+          data-intro="tagline"
+          className="mt-3 max-w-xl text-base leading-snug font-medium text-foreground md:mt-4 md:text-xl"
+        >
+          A full-service creative &amp; marketing agency for small
+          businesses — everything under one roof.
+        </p>
+
+        <p
+          data-intro="scramble"
+          className="mt-3 font-mono text-[0.65rem] tracking-[0.2em] text-foreground/60 uppercase md:text-xs"
+        >
           Let us build your{" "}
           <ScrambleWord
             words={VISION_WORDS}
             className="text-red-700 dark:text-red-500"
           />{" "}
-          together.
+          &mdash; together.
         </p>
 
-        {/* Who this is for. The old copy listed the services, which the
-            Services panel now does properly one screen later. */}
-        <p className="mt-4 max-w-xl font-mono text-xs leading-relaxed text-foreground/70 md:mt-6 md:text-sm">
-          A creative and marketing agency for small businesses
-          getting off the ground. Everything under one roof, so you only ever
-          have one number to call.
-        </p>
-
-        <div className="mt-6 flex flex-wrap justify-center gap-4 md:mt-8 md:justify-start">
+        <div
+          data-intro="actions"
+          className="mt-6 flex flex-wrap justify-center gap-4 md:mt-8 md:justify-start"
+        >
           <a
             href="#"
             className="rounded-lg bg-foreground px-6 py-3 text-xs tracking-widest text-background uppercase transition-colors hover:bg-foreground/80"
@@ -54,7 +68,10 @@ export default function Home() {
 
       {/* Right side stays empty: the scroll chevron is fixed in that corner. */}
       <div className="flex items-end justify-between gap-4">
-        <address className="text-xs leading-relaxed text-foreground/60 not-italic">
+        <address
+          data-intro="actions"
+          className="text-xs leading-relaxed text-foreground/60 not-italic"
+        >
           Based in Texas
           <br />
           Serving Worldwide

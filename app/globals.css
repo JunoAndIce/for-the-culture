@@ -111,20 +111,28 @@
 }
 
 :root {
+  /* #332920, a lighter step of the site's brand brown, stands in for every
+     near-black token here — text, the dark button fill, the dark sidebar
+     tokens — so black never appears anywhere in either theme. #171310 (dark
+     mode's --background) is too close to black to read as brown on thin
+     text and lines, which is only visible once a color covers a large
+     enough area; #332920 is the same hue, lightened until it reads as brown
+     at small sizes too, still comfortably >13:1 contrast against white.
+     lib/choreography.ts's light-mode SPHERE_COLOR reuses this exact value. */
   --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --foreground: #332920;
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: #332920;
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --popover-foreground: #332920;
+  --primary: #332920;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
+  --secondary-foreground: #332920;
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent-foreground: #332920;
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
@@ -136,29 +144,36 @@
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-foreground: #332920;
+  --sidebar-primary: #332920;
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-accent-foreground: #332920;
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  /* Warm dark-brown surfaces in place of the neutral-grayscale defaults.
+     Authored as hex rather than oklch(): lightningcss's oklch-to-lab
+     downlevel conversion collapsed this low-lightness/low-chroma
+     combination to zero chroma (the build's fallback --background came out
+     as flat #0a0a0a regardless of the hue we asked for). Hex ships as-is.
+     #171310 is the site's brand brown — lib/choreography.ts's SPHERE_COLOR
+     reuses this exact value for the sphere in light mode. */
+  --background: #171310;
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+  --card: #221c17;
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: #221c17;
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
+  --secondary: #2c251f;
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
+  --muted: #2c251f;
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --accent: #2c251f;
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
@@ -169,11 +184,11 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
+  --sidebar: #221c17;
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent: #2c251f;
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
@@ -214,4 +229,14 @@
   to {
     transform: translateX(-50%);
   }
+}
+
+/* Scroll lock while the intro plays. The gutter stays reserved, so the page
+   does not shift when the scrollbar returns. */
+html.intro-lock,
+html.intro-lock body {
+  overflow: hidden;
+}
+html.intro-lock {
+  scrollbar-gutter: stable;
 }

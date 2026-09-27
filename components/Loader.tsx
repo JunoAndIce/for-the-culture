@@ -3,6 +3,14 @@
 import { useRef, useState } from "react";
 import { useProgress } from "@react-three/drei";
 import { gsap, useGSAP } from "@/lib/gsap";
+import { INTRO } from "@/lib/choreography";
+import {
+  beginIntro,
+  completeIntro,
+  introTimeline,
+  requestIntro,
+  resetIntro,
+} from "@/lib/intro";
 
 /** Shortest time the count stays up, so a warm cache still reads as a count. */
 const MIN_MS = 1400;
@@ -19,12 +27,34 @@ export default function Loader() {
   const bar = useRef<HTMLDivElement>(null);
   const shown = useRef({ value: 0 });
   const startedAt = useRef(0);
+  const asked = useRef(false);
 
   useGSAP(() => {
     // In the mount effect, not a ref initialiser: Date.now() during render is impure.
     startedAt.current = Date.now();
-    const bail = gsap.delayedCall(TIMEOUT_S, () => setDone(true));
-    return () => bail.kill();
+
+    // Opens the intro before anything else registers. The dissolve is its first
+    // beat, so a skip or a bail-out finishes it too.
+    beginIntro();
+    introTimeline().to(
+      root.current,
+      {
+        autoAlpha: 0,
+        duration: INTRO.dissolve,
+        ease: "power1.out",
+        onComplete: () => setDone(true),
+      },
+      0,
+    );
+
+    const bail = gsap.delayedCall(TIMEOUT_S, () => {
+      completeIntro();
+      setDone(true);
+    });
+    return () => {
+      bail.kill();
+      resetIntro();
+    };
   }, []);
 
   useGSAP(() => {
@@ -43,14 +73,10 @@ export default function Loader() {
       },
     });
 
-    if (progress < 100) return;
+    if (progress < 100 || asked.current) return;
+    asked.current = true;
     const held = Math.max(0, MIN_MS - (Date.now() - startedAt.current)) / 1000;
-    gsap.to(root.current, {
-      autoAlpha: 0,
-      duration: 0.5,
-      delay: held + 0.25,
-      onComplete: () => setDone(true),
-    });
+    gsap.delayedCall(held + 0.25, requestIntro);
   }, [progress]);
 
   if (done) return null;

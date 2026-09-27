@@ -1,42 +1,36 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
-import ScriptReveal from "@/components/ScriptReveal";
-import { PROOF, SERVICES, STEPS } from "@/lib/services";
+import { PROOF, SERVICES } from "@/lib/services";
 
 export default function Services() {
   return (
     <section data-panel className="grid min-h-screen p-8 md:p-16 xl:p-24">
       <div className="flex flex-col justify-center md:items-end">
         <div className="flex w-full flex-col items-start text-left md:mr-12 md:max-w-3xl">
-          <ScriptReveal className="bg-linear-to-r from-[#AF2F34] via-[#A57100] to-[#1F7C44] bg-clip-text pt-[0.06em] pb-[0.22em] font-cochocib text-[clamp(2.5rem,5.5vw,4.5rem)] leading-[0.95] text-transparent dark:from-[#D75555] dark:via-[#F4BC48] dark:to-[#4AA167]">
-            For the Culture
-          </ScriptReveal>
-
-          <p className="mt-5 font-mono text-[0.65rem] tracking-[0.35em] text-red-700 uppercase md:text-xs dark:text-red-500">
-            What we do, and who for
+          <p
+            data-unfold
+            className="font-mono text-[0.65rem] tracking-[0.35em] text-red-700 uppercase md:text-xs dark:text-red-500"
+          >
+            What we do
           </p>
 
-          <h2 className="mt-3 text-[clamp(1.6rem,3.6vw,2.75rem)] leading-[1.08] font-bold tracking-tight text-balance">
-            <span>
-              Why are you waiting? Let&apos;s start that project now.
-            </span>{" "}
+          <h2
+            data-unfold
+            className="mt-3 text-[clamp(1.6rem,3.6vw,2.75rem)] leading-[1.08] font-bold tracking-tight text-balance"
+          >
+            <span>Five ways we grow small businesses.</span>{" "}
             <span className="text-foreground/50">
-              All the resources you will ever need, provided and managed by our team.
+              Pick where you need help most.
             </span>
           </h2>
-
-          <p className="mt-4 max-w-xl font-mono text-xs leading-relaxed text-foreground/70 md:text-sm">
-            <strong>For the Culture</strong> is commited to building a foundation for all small businesses around the world. Based in Houston, Texas, we provide all the necessary
-            tools needed to succeed in a competitive market today. Come and see our work, and see what we have in store. <strong>For the Culture</strong> is here to build a legacy.
-          </p>
 
           {/* A ruled list, not a card grid: five does not divide into columns,
               and the rows let the name and its plain-English line share a
               baseline that can be scanned in a breath. */}
           <ul className="mt-7 w-full border-t border-foreground/15">
             {SERVICES.map(({ slug, icon: Icon, name, body }) => (
-              <li key={slug}>
+              <li key={slug} data-unfold>
                 <Link
                   href={`/overview#${slug}`}
                   className="group grid grid-cols-[auto_1fr_auto] items-center gap-x-4 border-b border-foreground/15 py-3 transition-colors hover:border-foreground/40 md:grid-cols-[auto_13rem_1fr_auto] md:gap-x-6"
@@ -62,23 +56,7 @@ export default function Services() {
             ))}
           </ul>
 
-          <ol className="mt-7 grid w-full gap-4 sm:grid-cols-3">
-            {STEPS.map(({ n, title, body }) => (
-              <li key={n}>
-                <span className="font-mono text-[0.65rem] tracking-[0.2em] text-red-700 dark:text-red-500">
-                  {n}
-                </span>
-                <p className="mt-1 text-[0.7rem] tracking-widest text-foreground uppercase">
-                  {title}
-                </p>
-                <p className="mt-1 text-xs leading-relaxed font-light text-foreground/60">
-                  {body}
-                </p>
-              </li>
-            ))}
-          </ol>
-
-          <div className="mt-8 flex flex-wrap items-center gap-4">
+          <div data-unfold className="mt-8 flex flex-wrap items-center gap-4">
             <a
               href="#"
               className="rounded-lg bg-foreground px-6 py-3 text-xs tracking-widest text-background uppercase transition-colors hover:bg-foreground/80"
@@ -91,9 +69,18 @@ export default function Services() {
             >
               See the work
             </a>
+            <Link
+              href="/overview"
+              className="font-mono text-[0.65rem] tracking-[0.15em] text-foreground/50 uppercase transition-colors hover:text-foreground/80"
+            >
+              How a project runs &rarr;
+            </Link>
           </div>
 
-          <ul className="mt-6 flex w-full flex-wrap items-center gap-x-3 gap-y-1 border-t border-foreground/15 pt-4 font-mono text-[0.65rem] tracking-[0.15em] text-foreground/50 uppercase">
+          <ul
+            data-unfold
+            className="mt-6 flex w-full flex-wrap items-center gap-x-3 gap-y-1 border-t border-foreground/15 pt-4 font-mono text-[0.65rem] tracking-[0.15em] text-foreground/50 uppercase"
+          >
             {PROOF.map((fact, i) => (
               <li key={fact} className="flex items-center gap-3">
                 {i > 0 && (

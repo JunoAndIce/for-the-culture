@@ -148,6 +148,38 @@ function buildTimeline(
   });
 }
 
+// Tall panels rest anywhere from their top to their bottom edge. Between panels
+// a scroll goes on to the next top, or back to the previous panel's bottom edge.
+function panelSnapTo(
+  value: number,
+  self: ScrollTrigger,
+  panels: HTMLElement[],
+) {
+  const { start, end, direction } = self;
+  const change = end - start;
+  const first = panels[0].offsetTop;
+  const rests = panels.map((el): [number, number] => {
+    const top = start + el.offsetTop - first;
+    return [top, top + Math.max(0, el.offsetHeight - window.innerHeight)];
+  });
+
+  const at = start + value * change;
+  // GSAP's own 0.1% tolerance, so settling onto a stop can't re-fire the snap.
+  const slack = change * 1e-3;
+  const here = rests.find(
+    ([from, to]) => at >= from - slack && at <= to + slack,
+  );
+  const ahead = rests.find(([from]) => from > at);
+  const behind = rests.filter(([, to]) => to < at).pop();
+
+  let target: number;
+  if (here) target = Math.min(Math.max(at, here[0]), here[1]);
+  else if (!ahead) target = rests[rests.length - 1][0];
+  else if (!behind) target = ahead[0];
+  else target = direction < 0 ? behind[1] : ahead[0];
+  return (target - start) / change;
+}
+
 /**
  * Panel snapping, deliberately on its own ScrollTrigger with no dependencies:
  * on the sphere's it was rebuilt on every theme change, which re-fired the snap.
@@ -155,31 +187,27 @@ function buildTimeline(
 function usePanelSnap() {
   useGSAP(() => {
     const mm = gsap.matchMedia();
-    mm.add(
-      `(min-width: ${BREAKPOINT_MD}px) and (prefers-reduced-motion: no-preference)`,
-      () => {
-        const panels = gsap.utils.toArray<HTMLElement>(PANEL_SELECTOR);
-        if (panels.length < 2) return;
-        const tops = panels.map((el) => el.offsetTop);
-        const span = tops[tops.length - 1] - tops[0];
-        if (span <= 0) return;
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      const panels = gsap.utils.toArray<HTMLElement>(PANEL_SELECTOR);
+      if (panels.length < 2) return;
+      const span = panels[panels.length - 1].offsetTop - panels[0].offsetTop;
+      if (span <= 0) return;
 
-        ScrollTrigger.create({
-          trigger: panels[0],
-          start: "top top",
-          markers: false,
-          endTrigger: panels[panels.length - 1],
-          end: "top top",
-          snap: {
-            snapTo: tops.map((top) => (top - tops[0]) / span),
-            duration: { min: 0.5, max: 1.9 },
-            delay: 0.2,
-            ease: "power2.inOut",
-            directional: true,
-          },
-        });
-      },
-    );
+      ScrollTrigger.create({
+        trigger: panels[0],
+        start: "top top",
+        markers: false,
+        endTrigger: panels[panels.length - 1],
+        end: "top top",
+        snap: {
+          snapTo: (value, self) =>
+            self ? panelSnapTo(value, self, panels) : value,
+          duration: { min: 0.5, max: 1.9 },
+          delay: 0.2,
+          ease: "power2.inOut",
+        },
+      });
+    });
   }, []);
 }
 

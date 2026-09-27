@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import WireframeSphere from "./WireframeSphere";
-import { maskUrlFor } from "@/lib/choreography";
+import { CAMERA, maskUrlFor } from "@/lib/choreography";
 
 if (typeof document !== "undefined") {
   useTexture.preload(maskUrlFor(window.innerWidth));
@@ -16,7 +16,7 @@ export default function Scene() {
     // never moves, which is what lets one sphere serve all five screens.
     <div className="fixed inset-0 z-0">
       <Canvas
-        camera={{ position: [0, 0, 10], fov: 16 }}
+        camera={{ position: CAMERA.position, fov: CAMERA.fov }}
         // Phones often report DPR 3+; uncapped that means ~9x the pixels.
         dpr={[1, 2]}
         gl={{ powerPreference: "low-power" }}

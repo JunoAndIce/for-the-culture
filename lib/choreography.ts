@@ -59,20 +59,7 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
       zoom: 1.95,
       opacity: 0.3,
       glow: 1,
-      ring: {
-        tilt: 1.18,
-        radius: 1.25,
-        floor: 1.02,
-        thickness: 0.004,
-        size: 1.2,
-        disc: 1,
-        inner: 1.07,
-        outer: 1.44,
-        gap: 0.5,
-        gapWidth: 0.06,
-        bandFreq: 9,
-        bandDepth: 0.55,
-      },
+      ring: { tilt: 1.18, radius: 1.25, floor: 1.02 },
     },
     {
       x: -1.4,
@@ -82,20 +69,7 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
       zoom: 1.2,
       opacity: 0.5,
       glow: 1,
-      ring: {
-        tilt: 1.15,
-        radius: 1.45,
-        floor: 1.02,
-        thickness: 0.004,
-        size: 1.2,
-        disc: 1,
-        inner: 1.07,
-        outer: 1.44,
-        gap: 0.5,
-        gapWidth: 0.06,
-        bandFreq: 9,
-        bandDepth: 0.55,
-      },
+      ring: { tilt: 1.15, radius: 1.45, floor: 1.02 },
     },
     {
       x: -1.7,
@@ -105,20 +79,7 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
       zoom: 1.7,
       opacity: 0.05,
       glow: 1,
-      ring: {
-        tilt: 1.25,
-        radius: 1.45,
-        floor: 1.02,
-        thickness: 0.004,
-        size: 1.2,
-        disc: 1,
-        inner: 1.07,
-        outer: 1.44,
-        gap: 0.5,
-        gapWidth: 0.06,
-        bandFreq: 9,
-        bandDepth: 0.55,
-      },
+      ring: { tilt: 1.25, radius: 1.45, floor: 1.02 },
     },
     {
       x: 0,
@@ -159,20 +120,7 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
       zoom: 0.95,
       opacity: 0.2,
       glow: 1,
-      ring: {
-        tilt: 1.22,
-        radius: 1.25,
-        floor: 1.02,
-        thickness: 0.004,
-        size: 1.2,
-        disc: 1,
-        inner: 1.07,
-        outer: 1.44,
-        gap: 0.5,
-        gapWidth: 0.06,
-        bandFreq: 9,
-        bandDepth: 0.55,
-      },
+      ring: { tilt: 1.22, radius: 1.25, floor: 1.02 },
     },
     {
       x: 0,
@@ -182,20 +130,7 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
       zoom: 0.75,
       opacity: 0.08,
       glow: 1,
-      ring: {
-        tilt: 1.91,
-        radius: 1.45,
-        floor: 1.02,
-        thickness: 0.004,
-        size: 1.2,
-        disc: 1,
-        inner: 1.07,
-        outer: 1.44,
-        gap: 0.5,
-        gapWidth: 0.06,
-        bandFreq: 9,
-        bandDepth: 0.55,
-      },
+      ring: { tilt: 1.91, radius: 1.45, floor: 1.02 },
     },
     {
       x: 0,
@@ -205,20 +140,7 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
       zoom: 1.1,
       opacity: 0.04,
       glow: 1,
-      ring: {
-        tilt: 1.17,
-        radius: 1.45,
-        floor: 1.02,
-        thickness: 0.004,
-        size: 1.2,
-        disc: 1,
-        inner: 1.07,
-        outer: 1.44,
-        gap: 0.5,
-        gapWidth: 0.06,
-        bandFreq: 9,
-        bandDepth: 0.55,
-      },
+      ring: { tilt: 1.17, radius: 1.45, floor: 1.02 },
     },
     {
       x: 0,
@@ -228,20 +150,7 @@ export const SPHERE_PATH: Record<Layout, SphereState[]> = {
       zoom: 1.6,
       opacity: 0.03,
       glow: 1,
-      ring: {
-        tilt: 1.05,
-        radius: 1.45,
-        floor: 1.02,
-        thickness: 0.004,
-        size: 1.2,
-        disc: 1,
-        inner: 1.07,
-        outer: 1.44,
-        gap: 0.5,
-        gapWidth: 0.06,
-        bandFreq: 9,
-        bandDepth: 0.55,
-      },
+      ring: { tilt: 1.05, radius: 1.45, floor: 1.02 },
     },
     {
       x: 0,
@@ -280,8 +189,13 @@ export const SPHERE_SEGMENTS: Record<Layout, [number, number]> = {
   mobile: [32, 16],
 };
 
+// #332920 is the site's brand brown, lightened from dark mode's #171310
+// --background until it reads as brown rather than black at small sizes —
+// same value as --foreground in app/globals.css's :root. Light mode has no
+// brown surface of its own to borrow, so the sphere carries the color there
+// instead of black.
 export const SPHERE_COLOR: Record<"light" | "dark", string> = {
-  light: "#000000",
+  light: "#332920",
   dark: "#ffffff",
 };
 
@@ -345,3 +259,44 @@ export const GLOBE_MAX_SPIN = 4;
 
 /** Below this speed the fling has effectively stopped; snap it to rest. */
 export const GLOBE_MIN_SPIN = 0.002;
+
+/** The canvas camera's rest view. The intro pans in to exactly this. */
+export const CAMERA = { position: [0, 0, 10] as [number, number, number], fov: 16 };
+
+/** The post-loader intro, in seconds. The camera makes the move, not the sphere. */
+export const INTRO = {
+  /** Loader fade, overlapping the start of the pan. */
+  dissolve: 0.6,
+  pan: 3.2,
+  /** Camera start distance, centred on the planet. Rest is CAMERA.position[2]. */
+  pullBack: { desktop: 26, mobile: 19.6 } as Record<Layout, number>,
+  /** Camera start roll, in degrees. */
+  rollDeg: 6,
+  /** How far into the pan the words begin. */
+  wordsAt: 2,
+  /** The truck starts this late, and the roll settles in this share of the pan. */
+  truckLag: 0.1,
+  rollShare: 0.75,
+  /** How long a skip takes to catch the timeline up to its end. */
+  skip: 0.5,
+};
+
+/** Clip-path write-on, left to right. The negative bottom keeps script descenders. */
+export const SCRIPT_WIPE = {
+  // 105% on the right cancels the 5% overhang on the left, so it opens at zero width.
+  from: "inset(-15% 105% -30% -5%)",
+  to: "inset(-15% -5% -30% -5%)",
+};
+
+/** How a panel's copy builds once scrolling has stopped on it, in seconds. */
+export const UNFOLD = {
+  /** Stillness after the last scroll event before the build starts. */
+  settle: 0.15,
+  /** Each beat's length, and how far apart they start. */
+  duration: 0.7,
+  stagger: 0.12,
+  /** Pixels a beat rises through. */
+  rise: 20,
+  /** A slide travels in from past its container's edge, so it takes longer. */
+  slideDuration: 1.1,
+};

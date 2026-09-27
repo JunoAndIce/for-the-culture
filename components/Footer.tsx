@@ -28,7 +28,7 @@ export default function Footer() {
               <li key={item.label}>
                 <Link
                   href={item.href}
-                  className="whitespace-nowrap text-foreground/70 transition-colors hover:text-foreground"
+                  className="relative whitespace-nowrap text-foreground/70 transition-colors after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-red-700 after:transition-transform after:duration-300 after:content-[''] hover:text-foreground hover:after:scale-x-100 dark:after:bg-red-500"
                 >
                   {item.label}
                 </Link>

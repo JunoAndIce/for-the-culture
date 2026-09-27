@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
+import { whenIntroDone } from "@/lib/intro";
 
 type Props = {
   /** Cycled in order. The first is rendered server-side and shown if motion is reduced. */
@@ -30,18 +31,28 @@ export default function ScrambleWord({
 
       // Only animate when the visitor has not asked for reduced motion.
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const tl = gsap.timeline({ repeat: -1 });
+        let tl: gsap.core.Timeline | undefined;
 
-        // Start from the second word so the first render is held, not re-scrambled.
-        [...words.slice(1), words[0]].forEach((word) => {
-          tl.to(node, {
-            duration: scramble,
-            ease: "none",
-            scrambleText: { text: word, chars: "upperCase", speed: 0.4 },
-          }).to({}, { duration: hold });
+        // The intro resolves the first word; the cycle picks up once it is done.
+        const cancel = whenIntroDone(() => {
+          tl = gsap.timeline({ repeat: -1 });
+          // Hold the first word, then start from the second so it is not re-scrambled.
+          tl.to({}, { duration: hold });
+          [...words.slice(1), words[0]].forEach((word) => {
+            tl!
+              .to(node, {
+                duration: scramble,
+                ease: "none",
+                scrambleText: { text: word, chars: "upperCase", speed: 0.4 },
+              })
+              .to({}, { duration: hold });
+          });
         });
 
-        return () => tl.kill();
+        return () => {
+          cancel();
+          tl?.kill();
+        };
       });
     },
     { dependencies: [words, scramble, hold] },
@@ -68,6 +79,7 @@ export default function ScrambleWord({
       ))}
       <span
         ref={el}
+        data-scramble
         aria-hidden="true"
         className="absolute inset-y-0 left-0 whitespace-nowrap"
       >

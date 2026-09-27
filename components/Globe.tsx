@@ -16,7 +16,6 @@ export default function Globe() {
       data-panel
       className="relative grid min-h-screen grid-rows-[auto_1fr_auto] p-8 md:p-16 xl:p-24"
     >
-
       <div className="pointer-events-none absolute inset-0 grid place-items-center">
         <div
           data-globe-stage
@@ -25,7 +24,10 @@ export default function Globe() {
         />
       </div>
 
-      <h2 className="relative flex items-center justify-center gap-4 text-2xl font-extralight tracking-widest uppercase md:gap-6 md:text-5xl md:mt-8 mt-12 text-center">
+      <h2
+        data-unfold
+        className="relative mt-12 flex items-center justify-center gap-4 text-2xl font-extralight tracking-widest uppercase md:mt-8 md:gap-6 md:text-4xl text-center"
+      >
         <span
           aria-hidden="true"
           className="shrink-0 text-sm text-foreground/40 select-none"

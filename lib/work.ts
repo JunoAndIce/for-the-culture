@@ -3,49 +3,49 @@
  * panels show the short form; /affiliations shows the rest.
  */
 
-// Placeholder work. The three clients are the ones already quoted below, so
-// the panels and the page read as the same agency.
+// Placeholder work. Order here is the carousel order, and /affiliations makes
+// the first entry its hero, so the strongest build goes first.
 export const PROJECTS = [
   {
     slug: "kyro-bros",
     name: "Kyro & Bros.",
-    discipline: "Brand system, storefront, ops handover",
+    discipline: "Brand system, rental storefront, ops handover",
     summary:
-      "A logistics startup with three trucks and no name. We built the brand, the booking flow, and the dispatch playbook their team still runs on.",
+      "Three founders renting tents, tables and chairs out of what started as their own family's backyard setup. We built the brand, the storefront and the playbook that turned a favour into a Houston business.",
     detail:
-      "They came in with three trucks, a spreadsheet, and customers who only knew the drivers' first names. We started with the operation rather than the logo: how a job gets booked, who touches it, and where it falls apart on a bad week. The brand came out of that, and so did the booking flow. Six months after handover they hired their own operations lead and stopped calling us, which is the outcome we were aiming at.",
-    badges: ["Branding", "Next.js", "Design System", "Copywriting"],
-    year: "2025",
-    build: "11 wks",
-    outcome: "4x booking volume",
+      "Quay, Meagan and Chance had been running other people's parties long before there was a company, and the whole operation still moved over text message. We named the three rental packages and put the day rates in public, so the first question stopped being what does this cost and became which weekend. The brand came straight off their own line, built on family and driven by community, and the cards, the tent banners and the site all say what the family already said.",
+    badges: ["Branding", "Business Cards", "Rental Storefront", "Ops Playbook"],
+    year: "2026",
+    build: "4 wks",
+    outcome: "4x More Bookings",
     motif: "orbit",
   },
   {
-    slug: "halcyon-labs",
-    name: "Halcyon",
-    discipline: "Positioning and launch site",
+    slug: "powerwash",
+    name: "Hydro Cleaning",
+    discipline: "Physical Media and Website Launch",
     summary:
-      "Research tooling that needed to read as a product, not a paper. We found the story first, then built the site their sales team still leads with.",
+      "A Baton Rouge powerwashing company with two owners, a trailer, and no way for a neighbor to find them. We set them on For The Culture's path.",
     detail:
-      "The tooling was good and nobody could tell you what it was for. We spent the first three weeks in calls with their customers, not their founders, and came back with the sentence the company now opens with. The site was the easy part after that. Two years on, the positioning has outlived two rounds of funding and a full rebrand of the category around them.",
-    badges: ["Positioning", "Web Design", "Motion", "Analytics"],
-    year: "2024",
-    build: "6 wks",
-    outcome: "Launched on schedule",
+      "Christopher and Jered had the trailer, the insurance and the work ethic before they had a name anyone could repeat. We built the mark, the flyers and the door hangers first, because that is what a neighborhood actually sees, then the site to catch everyone the paper reached. The rate card went out front instead of behind a form, which is why the calls that come in now already know what a roof runs.",
+    badges: ["Brand Identity", "Physical Media", "Web Design", "Analytics"],
+    year: "2026",
+    build: "4 wks",
+    outcome: "2000+ site visits monthly",
     motif: "contour",
   },
   {
-    slug: "copperline",
-    name: "Copperline",
-    discipline: "Identity refresh and enablement",
+    slug: "hwy6-studios",
+    name: "HWY6 Studios",
+    discipline: "Collective identity, brand architecture, drop platform",
     summary:
-      "A twenty-year-old fabricator modernising without losing the shop-floor voice. We rebuilt the identity, then taught them to run it themselves.",
+      "A Houston creative collective working across film, fashion, athletics and community, running five brands nobody could tell were one. We built the system that holds them together.",
     detail:
-      "Twenty years of goodwill sat in a logo nobody could print at size. The risk was obvious: modernise it and lose the thing that made customers trust them. So we kept the marks the shop floor recognised, rebuilt everything around them, and then spent the last three weeks teaching their team to run it. They have not needed us since, and they tell people that.",
-    badges: ["Identity", "Print", "Art Direction", "Enablement"],
-    year: "2024",
-    build: "9 wks",
-    outcome: "No retainer needed",
+      "hwy6studios, hwy6archives, hwy6casting, 6athletics and hwy6tribe had each grown their own audience and their own look, and the collective underneath them was invisible from the outside. We built one identity loose enough that each arm keeps its voice and still reads as 6, then a single site where the pop-ups, the archive and the drops sit on the same shelf. Someone who came for the Bottega project can now find the casting page without being told it exists.",
+    badges: ["Identity", "Brand Architecture", "Drop Platform", "Art Direction"],
+    year: "2025",
+    build: "6 wks",
+    outcome: "Five brands, one front door",
     motif: "stack",
   },
 ] as const;
