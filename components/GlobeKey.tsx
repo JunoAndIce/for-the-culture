@@ -188,12 +188,11 @@ export default function GlobeKey() {
         className="relative row-start-3 mb-12 flex flex-col items-center gap-4 text-center max-lg:pointer-events-none lg:mb-0"
       >
         <p
-          className={`max-w-2xl text-xs leading-relaxed font-bold text-foreground/70 transition-opacity duration-300 motion-reduce:transition-none md:text-lg ${
+          className={`max-w-2xl text-xs leading-relaxed font-bold text-balance text-foreground/70 transition-opacity duration-300 motion-reduce:transition-none md:text-lg ${
             openId ? "max-lg:opacity-0" : ""
           }`}
         >
-          Our partners run out of Lagos, Lisbon, and Little Rock. The work
-          travels further than we do, and it is meant to.
+          For The Culture works for the world. Expansion is our mission.
         </p>
         {/* Fades rather than unmounts, so the caption above never shifts. */}
         <p

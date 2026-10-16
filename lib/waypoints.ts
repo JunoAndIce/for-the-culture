@@ -11,7 +11,7 @@ export type Waypoint = {
   body: string;
 };
 
-// Placeholder cities and copy.
+// Placeholder copy.
 export const WAYPOINTS: readonly Waypoint[] = [
   {
     id: "hou",
@@ -21,37 +21,7 @@ export const WAYPOINTS: readonly Waypoint[] = [
     lat: 29.76,
     lon: -95.37,
     role: "Home base",
-    body: "Where the studio sits. Every project starts with a call that lands here.",
-  },
-  {
-    id: "lit",
-    city: "Little Rock",
-    region: "AR",
-    tag: "Market",
-    lat: 34.75,
-    lon: -92.29,
-    role: "Partner market",
-    body: "Retail and restaurant brands. The first market we worked outside Texas.",
-  },
-  {
-    id: "lis",
-    city: "Lisbon",
-    region: "PT",
-    tag: "Studio",
-    lat: 38.72,
-    lon: -9.14,
-    role: "Partner studio",
-    body: "Design and production overflow, five hours ahead when a launch needs a night shift.",
-  },
-  {
-    id: "lag",
-    city: "Lagos",
-    region: "NG",
-    tag: "Market",
-    lat: 6.52,
-    lon: 3.38,
-    role: "Partner market",
-    body: "Consumer brands building for the diaspora and for home at the same time.",
+    body: "Our humble start. Growth begins here.",
   },
 ] as const;
 
