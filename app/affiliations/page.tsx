@@ -6,7 +6,6 @@ import Footer from "@/components/Footer";
 import ImagePlaceholder from "@/components/ImagePlaceholder";
 import Navbar from "@/components/Navbar";
 import ProjectImage from "@/components/ProjectImage";
-import Scene from "@/components/Scene";
 import { Badge } from "@/components/ui/badge";
 import { AFFILIATIONS, PROJECTS, TESTIMONIALS, type Project } from "@/lib/work";
 
@@ -152,8 +151,7 @@ export default function AffiliationsPage() {
   const [featured, ...voices] = TESTIMONIALS;
 
   return (
-    <div className="relative bg-background">
-      <Scene />
+    <div className="relative">
       {/* The sphere is texture here, not the subject: this page is for the work. */}
       <div
         aria-hidden="true"

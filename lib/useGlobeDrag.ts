@@ -11,6 +11,7 @@ import {
   GLOBE_STAGE_SELECTOR,
   GLOBE_TILT_LIMIT,
 } from "@/lib/choreography";
+import { onSceneRoute } from "@/lib/sceneRoute";
 import { takeSpinTarget } from "@/lib/waypoints";
 
 /** A pause this long before releasing means the drag has stopped, not flung. */
@@ -80,99 +81,118 @@ export function useGlobeDrag(globe: RefObject<Object3D | null>) {
   const turn = useRef<{ yaw: number; pitch: number } | null>(null);
 
   useEffect(() => {
-    const stage = document.querySelector<HTMLElement>(GLOBE_STAGE_SELECTOR);
     const target = globe.current;
-    if (!stage || !target) return;
-
+    if (!target) return;
     orientAsGlobe(target);
 
-    const noInertia = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const attach = (stage: HTMLElement) => {
+      const noInertia = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-    let pointer: number | null = null;
-    let lastX = 0;
-    let lastY = 0;
-    let lastTime = 0;
+      let pointer: number | null = null;
+      let lastX = 0;
+      let lastY = 0;
+      let lastTime = 0;
 
-    const onPointerDown = (e: PointerEvent) => {
-      // Ignore secondary buttons; a right-click drag should stay a context menu.
-      if (e.button !== 0 || pointer !== null) return;
+      const onPointerDown = (e: PointerEvent) => {
+        // Ignore secondary buttons; a right-click drag should stay a context menu.
+        if (e.button !== 0 || pointer !== null) return;
 
-      // Stops a mouse drag from painting a text selection across the copy it
-      // passes over. Left to touch, the same call can suppress panning in some
-      // engines, and touch-action is already handling that case.
-      if (e.pointerType === "mouse") e.preventDefault();
+        // Stops a mouse drag from painting a text selection across the copy it
+        // passes over. Left to touch, the same call can suppress panning in some
+        // engines, and touch-action is already handling that case.
+        if (e.pointerType === "mouse") e.preventDefault();
 
-      pointer = e.pointerId;
-      dragging.current = true;
-      spin.current.x = 0;
-      spin.current.y = 0;
-      // A hand on the globe outranks a turn it was part-way through.
-      turn.current = null;
-      lastX = e.clientX;
-      lastY = e.clientY;
-      lastTime = e.timeStamp;
-
-      // Keeps the drag alive past the edge of the stage. Not essential, and
-      // it throws if the pointer went away between the event and this line.
-      try {
-        stage.setPointerCapture(e.pointerId);
-      } catch {}
-      stage.dataset.grabbing = "true";
-    };
-
-    const onPointerMove = (e: PointerEvent) => {
-      if (e.pointerId !== pointer) return;
-
-      const dx = e.clientX - lastX;
-      const dy = e.clientY - lastY;
-      const dt = (e.timeStamp - lastTime) / 1000;
-      lastX = e.clientX;
-      lastY = e.clientY;
-      lastTime = e.timeStamp;
-
-      const yaw = dx * GLOBE_DRAG_SENSITIVITY;
-      const pitch = dy * GLOBE_DRAG_SENSITIVITY;
-
-      rotate(target, yaw, pitch);
-
-      // Speed of this one move, kept so releasing mid-drag can fling.
-      // Coarse pointers can report two moves on the same millisecond.
-      if (dt > 0) {
-        spin.current.y = clamp(yaw / dt, GLOBE_MAX_SPIN);
-        spin.current.x = clamp(pitch / dt, GLOBE_MAX_SPIN);
-      }
-    };
-
-    const onPointerEnd = (e: PointerEvent) => {
-      if (e.pointerId !== pointer) return;
-
-      pointer = null;
-      dragging.current = false;
-      delete stage.dataset.grabbing;
-
-      // Three ways a release is not a fling: the browser or the OS took the
-      // gesture away mid-drag, the user asked for less motion, or they held the
-      // globe still before letting go — in which case the last move's speed is
-      // stale and would throw it unprompted.
-      const held = e.timeStamp - lastTime > STALE_FLING_MS;
-      if (e.type === "pointercancel" || noInertia.matches || held) {
+        pointer = e.pointerId;
+        dragging.current = true;
         spin.current.x = 0;
         spin.current.y = 0;
-      }
+        // A hand on the globe outranks a turn it was part-way through.
+        turn.current = null;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        lastTime = e.timeStamp;
+
+        // Keeps the drag alive past the edge of the stage. Not essential, and
+        // it throws if the pointer went away between the event and this line.
+        try {
+          stage.setPointerCapture(e.pointerId);
+        } catch {}
+        stage.dataset.grabbing = "true";
+      };
+
+      const onPointerMove = (e: PointerEvent) => {
+        if (e.pointerId !== pointer) return;
+
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        const dt = (e.timeStamp - lastTime) / 1000;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        lastTime = e.timeStamp;
+
+        const yaw = dx * GLOBE_DRAG_SENSITIVITY;
+        const pitch = dy * GLOBE_DRAG_SENSITIVITY;
+
+        rotate(target, yaw, pitch);
+
+        // Speed of this one move, kept so releasing mid-drag can fling.
+        // Coarse pointers can report two moves on the same millisecond.
+        if (dt > 0) {
+          spin.current.y = clamp(yaw / dt, GLOBE_MAX_SPIN);
+          spin.current.x = clamp(pitch / dt, GLOBE_MAX_SPIN);
+        }
+      };
+
+      const onPointerEnd = (e: PointerEvent) => {
+        if (e.pointerId !== pointer) return;
+
+        pointer = null;
+        dragging.current = false;
+        delete stage.dataset.grabbing;
+
+        // Three ways a release is not a fling: the browser or the OS took the
+        // gesture away mid-drag, the user asked for less motion, or they held the
+        // globe still before letting go — in which case the last move's speed is
+        // stale and would throw it unprompted.
+        const held = e.timeStamp - lastTime > STALE_FLING_MS;
+        if (e.type === "pointercancel" || noInertia.matches || held) {
+          spin.current.x = 0;
+          spin.current.y = 0;
+        }
+      };
+
+      stage.addEventListener("pointerdown", onPointerDown);
+      stage.addEventListener("pointermove", onPointerMove);
+      stage.addEventListener("pointerup", onPointerEnd);
+      stage.addEventListener("pointercancel", onPointerEnd);
+
+      return () => {
+        stage.removeEventListener("pointerdown", onPointerDown);
+        stage.removeEventListener("pointermove", onPointerMove);
+        stage.removeEventListener("pointerup", onPointerEnd);
+        stage.removeEventListener("pointercancel", onPointerEnd);
+        delete stage.dataset.grabbing;
+        dragging.current = false;
+      };
     };
 
-    stage.addEventListener("pointerdown", onPointerDown);
-    stage.addEventListener("pointermove", onPointerMove);
-    stage.addEventListener("pointerup", onPointerEnd);
-    stage.addEventListener("pointercancel", onPointerEnd);
+    // The canvas outlives its pages: each page starts square, with nothing in
+    // flight, and with listeners only if it has a stage.
+    let detach = () => {};
+    const off = onSceneRoute(() => {
+      detach();
+      target.rotation.set(0, 0, 0);
+      spin.current.x = 0;
+      spin.current.y = 0;
+      turn.current = null;
+      takeSpinTarget();
+      const stage = document.querySelector<HTMLElement>(GLOBE_STAGE_SELECTOR);
+      detach = stage ? attach(stage) : () => {};
+    });
 
     return () => {
-      stage.removeEventListener("pointerdown", onPointerDown);
-      stage.removeEventListener("pointermove", onPointerMove);
-      stage.removeEventListener("pointerup", onPointerEnd);
-      stage.removeEventListener("pointercancel", onPointerEnd);
-      delete stage.dataset.grabbing;
-      dragging.current = false;
+      off();
+      detach();
     };
   }, [globe]);
 

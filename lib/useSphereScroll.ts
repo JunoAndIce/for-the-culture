@@ -15,6 +15,7 @@ import {
   type Layout,
   type SphereState,
 } from "@/lib/choreography";
+import { onSceneRoute } from "@/lib/sceneRoute";
 import { onSphereTurn } from "@/lib/sphereTurn";
 
 /**
@@ -224,35 +225,42 @@ function panelSnapTo(
   return (target - start) / change;
 }
 
-/**
- * Panel snapping, deliberately on its own ScrollTrigger with no dependencies:
- * on the sphere's it was rebuilt on every theme change, which re-fired the snap.
- */
-function usePanelSnap() {
-  useGSAP(() => {
-    const mm = gsap.matchMedia();
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
-      const panels = gsap.utils.toArray<HTMLElement>(PANEL_SELECTOR);
-      if (panels.length < 2) return;
-      const span = panels[panels.length - 1].offsetTop - panels[0].offsetTop;
-      if (span <= 0) return;
+// Panel snapping, on its own ScrollTrigger. Built per page with the timeline but
+// never on a theme change: rebuilding on the theme used to re-fire the snap.
+function buildPanelSnap() {
+  const panels = gsap.utils.toArray<HTMLElement>(PANEL_SELECTOR);
+  if (panels.length < 2) return;
+  const span = panels[panels.length - 1].offsetTop - panels[0].offsetTop;
+  if (span <= 0) return;
 
-      ScrollTrigger.create({
-        trigger: panels[0],
-        start: "top top",
-        markers: false,
-        endTrigger: panels[panels.length - 1],
-        end: "top top",
-        snap: {
-          snapTo: (value, self) =>
-            self ? panelSnapTo(value, self, panels) : value,
-          duration: { min: 0.5, max: 1.9 },
-          delay: 0.2,
-          ease: "power2.inOut",
-        },
-      });
-    });
-  }, []);
+  ScrollTrigger.create({
+    trigger: panels[0],
+    start: "top top",
+    markers: false,
+    endTrigger: panels[panels.length - 1],
+    end: "top top",
+    snap: {
+      snapTo: (value, self) =>
+        self ? panelSnapTo(value, self, panels) : value,
+      duration: { min: 0.5, max: 1.9 },
+      delay: 0.2,
+      ease: "power2.inOut",
+    },
+  });
+}
+
+/** Everything one page drives: its pose, then the timeline or deck turn, and the snap. */
+function buildPage(n: Resolved, layout: Layout, reduceMotion: boolean) {
+  const path = SPHERE_PATH[layout];
+
+  // Establish the layout's starting pose before the triggers capture it.
+  poseFor(n, path[0], layout).forEach(([target, vars]) => gsap.set(target, vars));
+
+  const built = buildTimeline(n, path, layout, reduceMotion);
+  if (!reduceMotion) buildPanelSnap();
+  if (!built && document.querySelector(SERVICE_DECK_SELECTOR)) {
+    return turnWithDeck(n, path[0], reduceMotion);
+  }
 }
 
 /**
@@ -270,13 +278,11 @@ function usePanelSnap() {
  * Position and scale stay above everything, so no rotation can turn the
  * sphere's offset into an orbit around the origin.
  *
- * Built once. Nothing here depends on the theme — the material colour is a
- * React prop — and rebuilding on a toggle was jolting the reader to another
- * panel.
+ * Built once per page (onSceneRoute). Nothing here depends on the theme — the
+ * material colour is a React prop — and rebuilding on a toggle was jolting the
+ * reader to another panel.
  */
 export function useSphereScroll(nodes: SphereNodes) {
-  usePanelSnap();
-
   useGSAP(
     () => {
       const frame = nodes.frame.current;
@@ -290,8 +296,19 @@ export function useSphereScroll(nodes: SphereNodes) {
       const n: Resolved = { frame, spin, land, wire, glow, glowTilt };
       orientAsAxis(spin);
 
-      const mm = gsap.matchMedia();
+      // One matchMedia for the hook's life: GSAP never drops a query's listener,
+      // so one per page would leak them. Each page is a context inside it.
+      let media: { layout: Layout; reduceMotion: boolean } | null = null;
+      let page: gsap.Context | null = null;
+      let routed = false;
+      let pending = 0;
+      const build = () => {
+        page?.revert();
+        const { layout, reduceMotion } = media!;
+        page = gsap.context(() => buildPage(n, layout, reduceMotion));
+      };
 
+      const mm = gsap.matchMedia();
       mm.add(
         {
           isDesktop: `(min-width: ${BREAKPOINT_MD}px)`,
@@ -299,23 +316,36 @@ export function useSphereScroll(nodes: SphereNodes) {
           reduceMotion: "(prefers-reduced-motion: reduce)",
         },
         (context) => {
-          const { isDesktop = false, reduceMotion = false } =
-            context.conditions ?? {};
-
-          const layout: Layout = isDesktop ? "desktop" : "mobile";
-          const path = SPHERE_PATH[layout];
-
-          // Establish the layout's starting pose before the triggers capture it.
-          poseFor(n, path[0], layout).forEach(([target, vars]) =>
-            gsap.set(target, vars),
-          );
-
-          const built = buildTimeline(n, path, layout, reduceMotion);
-          if (!built && document.querySelector(SERVICE_DECK_SELECTOR)) {
-            return turnWithDeck(n, path[0], reduceMotion);
-          }
+          const { isDesktop = false, reduceMotion = false } = context.conditions ?? {};
+          media = { layout: isDesktop ? "desktop" : "mobile", reduceMotion };
+          if (routed) build();
+          return () => {
+            page?.revert();
+            page = null;
+          };
         },
       );
+
+      // The canvas outlives its pages, so each page gets its own build.
+      const off = onSceneRoute(() => {
+        routed = true;
+        page?.revert();
+        page = null;
+        cancelAnimationFrame(pending);
+        // Pose 0 before the new page paints; the build waits a frame for Next's scroll.
+        const { layout } = media!;
+        poseFor(n, SPHERE_PATH[layout][0], layout).forEach(([target, vars]) =>
+          gsap.set(target, vars),
+        );
+        pending = requestAnimationFrame(build);
+      });
+
+      return () => {
+        off();
+        cancelAnimationFrame(pending);
+        page?.revert();
+        mm.revert();
+      };
     },
     { dependencies: [] },
   );

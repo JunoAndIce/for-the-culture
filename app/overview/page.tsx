@@ -3,7 +3,6 @@ import Link from "next/link";
 
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import Scene from "@/components/Scene";
 import ServiceDeck from "@/components/ServiceDeck";
 import { PROOF, STEPS } from "@/lib/services";
 
@@ -19,8 +18,7 @@ export const metadata: Metadata = {
  */
 export default function OverviewPage() {
   return (
-    <div className="relative bg-background">
-      <Scene />
+    <div className="relative">
       {/* The sphere is texture here, not the subject: this page is for reading. */}
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 bg-background/85" />
       <Navbar />

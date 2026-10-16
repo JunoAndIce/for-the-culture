@@ -38,7 +38,8 @@ async (page) => {
       await page.evaluate((k) => { const el = document.querySelectorAll('[data-panel]')[k]; window.scrollTo(0, el.offsetTop); }, k);
       await page.waitForTimeout(2600);
     } }])),
-    home_to_overview_clientnav: { dpr: 1, frozen: false, run: async (base) => {
+    // Reduced motion: the overview drift starts sooner without a canvas rebuild, so compare the pose, not the timing.
+    home_to_overview_clientnav: { dpr: 1, frozen: false, reduced: true, run: async (base) => {
       await page.goto(base + '/', { waitUntil: 'load' }); await settledHome();
       await page.evaluate(() => { const el = document.querySelectorAll('[data-panel]')[4]; window.scrollTo(0, el.offsetTop); });
       await page.waitForTimeout(2000);
@@ -49,6 +50,7 @@ async (page) => {
 
   const shoot = async (view, base, canvasOnly) => {
     await cdp.send('Emulation.setDeviceMetricsOverride', { width: view.w || 1440, height: view.h || 900, deviceScaleFactor: view.dpr, mobile: !!view.mobile });
+    await cdp.send('Emulation.setEmulatedMedia', { features: view.reduced ? [{ name: 'prefers-reduced-motion', value: 'reduce' }] : [] });
     await view.run(base);
     await page.evaluate(() => document.fonts.ready);
     if (canvasOnly) { await page.addStyleTag({ content: CANVAS_ONLY }); await page.waitForTimeout(250); }
@@ -82,6 +84,7 @@ async (page) => {
       out[name + ' (full page)'] = await diff(fa, fb, false);
     }
   }
+  await cdp.send('Emulation.setEmulatedMedia', { features: [] });
   await cdp.send('Emulation.clearDeviceMetricsOverride');
   return out;
 }

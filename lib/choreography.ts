@@ -49,6 +49,9 @@ export const BREAKPOINT_MD = 768;
 
 export const PANEL_SELECTOR = "[data-panel]";
 
+/** Pages that sit over the sphere. Anything else, a 404 included, gets no canvas. */
+export const SCENE_ROUTES: readonly string[] = ["/", "/overview", "/affiliations"];
+
 export const SPHERE_PATH: Record<Layout, SphereState[]> = {
   desktop: [
     {

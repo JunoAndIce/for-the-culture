@@ -9,6 +9,7 @@ import {
 } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+import Scene from "@/components/Scene";
 import ThemeProvider from "@/components/ThemeProvider";
 
 const geistSans = Geist({
@@ -82,6 +83,7 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
+          <Scene />
           {children}
         </ThemeProvider>
       </body>
