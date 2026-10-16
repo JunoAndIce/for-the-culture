@@ -11,9 +11,26 @@ import {
   GLOBE_STAGE_SELECTOR,
   GLOBE_TILT_LIMIT,
 } from "@/lib/choreography";
+import { takeSpinTarget } from "@/lib/waypoints";
 
 /** A pause this long before releasing means the drag has stopped, not flung. */
 const STALE_FLING_MS = 80;
+
+/** Fraction of the remaining turn covered each second on the way to a waypoint. */
+const TURN_RATE = 7;
+
+/** Radians from the target at which the turn is done. */
+const TURN_SETTLED = 0.0015;
+
+// Cached rather than queried per frame: a picked waypoint cuts straight to
+// place where motion is unwelcome, instead of sweeping there.
+let reduceMotion: MediaQueryList | null = null;
+const noTurnEase = () => {
+  if (!reduceMotion && typeof window !== "undefined") {
+    reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  }
+  return reduceMotion?.matches ?? false;
+};
 
 const clamp = (v: number, limit: number) => Math.min(limit, Math.max(-limit, v));
 
@@ -59,6 +76,8 @@ export function useGlobeDrag(globe: RefObject<Object3D | null>) {
   // Angular velocity in rad/s, carried out of a fling and decayed in useFrame.
   const spin = useRef({ x: 0, y: 0 });
   const dragging = useRef(false);
+  // Where a picked waypoint wants the globe. Null unless a turn is running.
+  const turn = useRef<{ yaw: number; pitch: number } | null>(null);
 
   useEffect(() => {
     const stage = document.querySelector<HTMLElement>(GLOBE_STAGE_SELECTOR);
@@ -87,6 +106,8 @@ export function useGlobeDrag(globe: RefObject<Object3D | null>) {
       dragging.current = true;
       spin.current.x = 0;
       spin.current.y = 0;
+      // A hand on the globe outranks a turn it was part-way through.
+      turn.current = null;
       lastX = e.clientX;
       lastY = e.clientY;
       lastTime = e.timeStamp;
@@ -157,8 +178,46 @@ export function useGlobeDrag(globe: RefObject<Object3D | null>) {
 
   useFrame((_, delta) => {
     const target = globe.current;
-    const v = spin.current;
     if (!target || dragging.current) return;
+
+    const picked = takeSpinTarget();
+    if (picked) {
+      // Shorter way round, and a fling still decaying would fight the turn.
+      const laps = Math.round((target.rotation.y - picked.yaw) / (Math.PI * 2));
+      turn.current = {
+        yaw: picked.yaw + laps * Math.PI * 2,
+        pitch: clamp(picked.pitch, GLOBE_TILT_LIMIT),
+      };
+      spin.current.x = 0;
+      spin.current.y = 0;
+    }
+
+    const to = turn.current;
+    if (to) {
+      // Frame-rate independent, and instant where motion is unwelcome. Goes
+      // through rotate() so the tilt limit holds here as it does for a drag.
+      const k = noTurnEase() ? 1 : 1 - Math.exp(-TURN_RATE * delta);
+      rotate(
+        target,
+        (to.yaw - target.rotation.y) * k,
+        (to.pitch - target.rotation.x) * k,
+      );
+
+      if (
+        Math.abs(to.yaw - target.rotation.y) < TURN_SETTLED &&
+        Math.abs(to.pitch - target.rotation.x) < TURN_SETTLED
+      ) {
+        rotate(
+          target,
+          to.yaw - target.rotation.y,
+          to.pitch - target.rotation.x,
+        );
+        turn.current = null;
+      }
+      return;
+    }
+
+    const v = spin.current;
     if (v.x === 0 && v.y === 0) return;
 
     // A fling that has tipped the globe as far as it goes keeps its spin but

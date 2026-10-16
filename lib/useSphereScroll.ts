@@ -51,7 +51,8 @@ const opacityFor = (
 const tiltFor = (state: SphereState) => state.rotX ?? 0;
 
 /** Panels are dark by default, so the ring is opt-in per panel. */
-const glowFor = (state: SphereState) => (state.glow ?? 0) * GLOBE_GLOW.intensity;
+const glowFor = (state: SphereState, layout: Layout) =>
+  (state.glow ?? 0) * GLOBE_GLOW.intensity[layout];
 
 /** A panel's ring overrides, over the GLOBE_GLOW defaults. */
 const ringFor = (state: SphereState) => ({
@@ -61,6 +62,13 @@ const ringFor = (state: SphereState) => ({
   floor: GLOBE_GLOW.floor,
   thickness: GLOBE_GLOW.thickness,
   size: GLOBE_GLOW.size,
+  disc: GLOBE_GLOW.disc,
+  inner: GLOBE_GLOW.inner,
+  outer: GLOBE_GLOW.outer,
+  gap: GLOBE_GLOW.gap,
+  gapWidth: GLOBE_GLOW.gapWidth,
+  bandFreq: GLOBE_GLOW.bandFreq,
+  bandDepth: GLOBE_GLOW.bandDepth,
   ...state.ring,
 });
 
@@ -68,9 +76,9 @@ const ringFor = (state: SphereState) => ({
 function poseFor(
   n: Resolved,
   state: SphereState,
-  base: number,
+  layout: Layout,
 ): [object, Record<string, number>][] {
-  const scale = scaleFor(state, base);
+  const scale = scaleFor(state, SPHERE_SCALE[layout]);
   const ring = ringFor(state);
   const u = n.glow.uniforms;
   return [
@@ -80,12 +88,19 @@ function poseFor(
     [n.land, { opacity: opacityFor(state, "land") }],
     [n.wire, { opacity: opacityFor(state, "wire") }],
     [n.glowTilt.rotation, { x: ring.tilt }],
-    [u.uOpacity, { value: glowFor(state) }],
+    [u.uOpacity, { value: glowFor(state, layout) }],
     [u.uRing, { value: ring.radius }],
     [u.uSpread, { value: ring.spread }],
     [u.uFloor, { value: ring.floor }],
     [u.uThickness, { value: ring.thickness }],
     [u.uSize, { value: ring.size }],
+    [u.uDisc, { value: ring.disc }],
+    [u.uInner, { value: ring.inner }],
+    [u.uOuter, { value: ring.outer }],
+    [u.uGap, { value: ring.gap }],
+    [u.uGapWidth, { value: ring.gapWidth }],
+    [u.uBandFreq, { value: ring.bandFreq }],
+    [u.uBandDepth, { value: ring.bandDepth }],
   ];
 }
 
@@ -97,7 +112,7 @@ function orientAsAxis(spin: Object3D) {
 function buildTimeline(
   n: Resolved,
   path: SphereState[],
-  base: number,
+  layout: Layout,
   reduceMotion: boolean,
 ) {
   const panels = gsap.utils.toArray<HTMLElement>(PANEL_SELECTOR);
@@ -127,10 +142,42 @@ function buildTimeline(
     // Each segment lasts the real scroll distance between its two panels, so
     // adding a panel extends the timeline instead of retiming earlier ones.
     const duration = (tops[i + 1] - tops[i]) / span;
-    poseFor(n, state, base).forEach(([target, vars], k) => {
+    poseFor(n, state, layout).forEach(([target, vars], k) => {
       tl.to(target, { ...vars, duration }, k > 0 ? "<" : i === 0 ? 0 : ">");
     });
   });
+}
+
+// Tall panels rest anywhere from their top to their bottom edge. Between panels
+// a scroll goes on to the next top, or back to the previous panel's bottom edge.
+function panelSnapTo(
+  value: number,
+  self: ScrollTrigger,
+  panels: HTMLElement[],
+) {
+  const { start, end, direction } = self;
+  const change = end - start;
+  const first = panels[0].offsetTop;
+  const rests = panels.map((el): [number, number] => {
+    const top = start + el.offsetTop - first;
+    return [top, top + Math.max(0, el.offsetHeight - window.innerHeight)];
+  });
+
+  const at = start + value * change;
+  // GSAP's own 0.1% tolerance, so settling onto a stop can't re-fire the snap.
+  const slack = change * 1e-3;
+  const here = rests.find(
+    ([from, to]) => at >= from - slack && at <= to + slack,
+  );
+  const ahead = rests.find(([from]) => from > at);
+  const behind = rests.filter(([, to]) => to < at).pop();
+
+  let target: number;
+  if (here) target = Math.min(Math.max(at, here[0]), here[1]);
+  else if (!ahead) target = rests[rests.length - 1][0];
+  else if (!behind) target = ahead[0];
+  else target = direction < 0 ? behind[1] : ahead[0];
+  return (target - start) / change;
 }
 
 /**
@@ -140,12 +187,10 @@ function buildTimeline(
 function usePanelSnap() {
   useGSAP(() => {
     const mm = gsap.matchMedia();
-    // No snap under reduced motion; moving the page unasked is the whole point.
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       const panels = gsap.utils.toArray<HTMLElement>(PANEL_SELECTOR);
       if (panels.length < 2) return;
-      const tops = panels.map((el) => el.offsetTop);
-      const span = tops[tops.length - 1] - tops[0];
+      const span = panels[panels.length - 1].offsetTop - panels[0].offsetTop;
       if (span <= 0) return;
 
       ScrollTrigger.create({
@@ -155,15 +200,11 @@ function usePanelSnap() {
         endTrigger: panels[panels.length - 1],
         end: "top top",
         snap: {
-          // Real panel tops, not an even increment, so a panel taller than the
-          // viewport still lands square.
-          snapTo: tops.map((top) => (top - tops[0]) / span),
+          snapTo: (value, self) =>
+            self ? panelSnapTo(value, self, panels) : value,
           duration: { min: 0.5, max: 1.9 },
           delay: 0.2,
           ease: "power2.inOut",
-          // Nearest stop, not the one you were heading for: a stray pixel of
-          // scroll should never carry the reader to the next panel.
-          directional: true,
         },
       });
     });
@@ -219,14 +260,13 @@ export function useSphereScroll(nodes: SphereNodes) {
 
           const layout: Layout = isDesktop ? "desktop" : "mobile";
           const path = SPHERE_PATH[layout];
-          const base = SPHERE_SCALE[layout];
 
           // Establish the layout's starting pose before the triggers capture it.
-          poseFor(n, path[0], base).forEach(([target, vars]) =>
+          poseFor(n, path[0], layout).forEach(([target, vars]) =>
             gsap.set(target, vars),
           );
 
-          buildTimeline(n, path, base, reduceMotion);
+          buildTimeline(n, path, layout, reduceMotion);
         },
       );
     },

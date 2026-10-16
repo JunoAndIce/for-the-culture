@@ -9,42 +9,69 @@ export default function Home() {
       className="grid min-h-screen grid-rows-[1fr_auto] p-8 md:p-16 xl:p-24"
     >
       <div className="flex flex-col items-center justify-center text-center md:items-start md:text-left">
-        <p className="font-script text-[clamp(3.5rem,11vw,16rem)] leading-none">
-          For the Culture
-        </p>
-        <p className="text-xs md:text-2xl font-black uppercase mt-4 md:mt-0">
-          FTC Enterprises
-        </p>
-        <p className="text-lg md:text-4xl font-light uppercase mt-0 md:mt-4">
-          Let us build your{" "}
-          <ScrambleWord words={VISION_WORDS} className="text-red-700" />{" "}
-          together.
-        </p>
-        <p className="text-xs md:text-sm font-light uppercase md:w-[75ch] mt-4 md:mt-8">
-          For The Culture is a full-service creative agency specializing in web
-          design, branding, and digital marketing. We help businesses and
-          individuals bring their ideas to life through innovative design and
-          strategic marketing solutions.
+        {/* Above the mark, not under it: underneath it read as a caption for
+            the script rather than as the company's name. */}
+        <p
+          data-intro="eyebrow"
+          className="font-mono text-[0.6rem] tracking-[0.34em] text-foreground/60 uppercase md:text-xs"
+        >
+          FTC Enterprises &middot; Houston, TX
         </p>
 
-        <div className="mt-6 flex flex-wrap justify-center gap-4 md:mt-8 md:justify-start">
-          <a
-            href="#"
-            className="rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10"
-          >
-            Learn More
-          </a>
+        <p
+          data-intro="wordmark"
+          className="mt-2 font-script text-[clamp(3.5rem,11vw,16rem)] leading-none"
+        >
+          For the Culture
+        </p>
+
+        {/* The plain answer to "what do you do," stated once, before the
+            flourish below gets a turn. */}
+        <p
+          data-intro="tagline"
+          className="mt-3 max-w-xl text-base leading-snug font-medium text-foreground md:mt-4 md:text-xl"
+        >
+          A full-service creative &amp; marketing agency for small
+          businesses — everything under one roof.
+        </p>
+
+        <p
+          data-intro="scramble"
+          className="mt-3 font-mono text-[0.65rem] tracking-[0.2em] text-foreground/60 uppercase md:text-xs"
+        >
+          Let us build your{" "}
+          <ScrambleWord
+            words={VISION_WORDS}
+            className="text-red-700 dark:text-red-500"
+          />{" "}
+          &mdash; together.
+        </p>
+
+        <div
+          data-intro="actions"
+          className="mt-6 flex flex-wrap justify-center gap-4 md:mt-8 md:justify-start"
+        >
           <a
             href="#"
             className="rounded-lg bg-foreground px-6 py-3 text-xs tracking-widest text-background uppercase transition-colors hover:bg-foreground/80"
           >
-            Join Us
+            Join us
+          </a>
+          <a
+            href="#"
+            className="rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10"
+          >
+            See what we do
           </a>
         </div>
       </div>
 
+      {/* Right side stays empty: the scroll chevron is fixed in that corner. */}
       <div className="flex items-end justify-between gap-4">
-        <address className="text-xs leading-relaxed text-foreground/60 not-italic">
+        <address
+          data-intro="actions"
+          className="text-xs leading-relaxed text-foreground/60 not-italic"
+        >
           Based in Texas
           <br />
           Serving Worldwide

@@ -1,8 +1,18 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { useProgress } from "@react-three/drei";
 import { gsap, useGSAP } from "@/lib/gsap";
+import { INTRO } from "@/lib/choreography";
+import {
+  beginIntro,
+  completeIntro,
+  introTimeline,
+  isSphereReady,
+  requestIntro,
+  resetIntro,
+  subscribeSphereReady,
+} from "@/lib/intro";
 
 /** Shortest time the count stays up, so a warm cache still reads as a count. */
 const MIN_MS = 1400;
@@ -12,6 +22,10 @@ const TIMEOUT_S = 8;
 export default function Loader() {
   // Fed by three's loading manager, which the mask preload in Scene kicks off.
   const { progress } = useProgress();
+  // What the reveal actually waits on: back on / with the mask cached, no
+  // progress is ever reported, but the sphere still mounts.
+  const sphereReady = useSyncExternalStore(subscribeSphereReady, isSphereReady, () => false);
+  const target = sphereReady ? 100 : progress;
   const [done, setDone] = useState(false);
 
   const root = useRef<HTMLDivElement>(null);
@@ -23,15 +37,36 @@ export default function Loader() {
   useGSAP(() => {
     // In the mount effect, not a ref initialiser: Date.now() during render is impure.
     startedAt.current = Date.now();
-    const bail = gsap.delayedCall(TIMEOUT_S, () => setDone(true));
-    return () => bail.kill();
+
+    // Opens the intro before anything else registers. The dissolve is its first
+    // beat, so a skip or a bail-out finishes it too.
+    beginIntro();
+    introTimeline().to(
+      root.current,
+      {
+        autoAlpha: 0,
+        duration: INTRO.dissolve,
+        ease: "power1.out",
+        onComplete: () => setDone(true),
+      },
+      0,
+    );
+
+    const bail = gsap.delayedCall(TIMEOUT_S, () => {
+      completeIntro();
+      setDone(true);
+    });
+    return () => {
+      bail.kill();
+      resetIntro();
+    };
   }, []);
 
   useGSAP(() => {
     // Written straight to the DOM: at 60fps a state update per frame would
     // re-render the whole tree for one changing digit.
     gsap.to(shown.current, {
-      value: progress,
+      value: target,
       duration: 0.5,
       ease: "power1.out",
       overwrite: true,
@@ -43,15 +78,12 @@ export default function Loader() {
       },
     });
 
-    if (progress < 100) return;
+    // No once-only ref: a strict-mode remount reverts this call, so it must be
+    // made again. requestIntro ignores repeats.
+    if (!sphereReady) return;
     const held = Math.max(0, MIN_MS - (Date.now() - startedAt.current)) / 1000;
-    gsap.to(root.current, {
-      autoAlpha: 0,
-      duration: 0.5,
-      delay: held + 0.25,
-      onComplete: () => setDone(true),
-    });
-  }, [progress]);
+    gsap.delayedCall(held + 0.25, requestIntro);
+  }, [target, sphereReady]);
 
   if (done) return null;
 

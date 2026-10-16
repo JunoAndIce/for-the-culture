@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
+import { SCRIPT_WIPE } from "@/lib/choreography";
 
 type Props = {
   children: string;
@@ -44,9 +45,9 @@ export default function ScriptReveal({
 
       // Reduced motion never clips, so the line is simply there from the start.
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.set(node, { clipPath: "inset(-15% 100% -30% -5%)" });
+        gsap.set(node, { clipPath: SCRIPT_WIPE.from });
         const tween = gsap.to(node, {
-          clipPath: "inset(-15% -5% -30% -5%)",
+          clipPath: SCRIPT_WIPE.to,
           duration,
           ease: "power1.inOut",
           scrollTrigger: { trigger: node, start: "top 85%" },

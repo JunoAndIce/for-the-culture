@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import { useTheme } from "next-themes";
@@ -15,6 +15,8 @@ import {
   type Layout,
 } from "@/lib/choreography";
 import GlobeGlow from "./GlobeGlow";
+import Waypoints from "./Waypoints";
+import { markSphereReady } from "@/lib/intro";
 import { useGlobeDrag } from "@/lib/useGlobeDrag";
 import { useSphereScroll } from "@/lib/useSphereScroll";
 
@@ -61,6 +63,8 @@ export default function WireframeSphere() {
 
   useSphereScroll({ frame, spin, land, wire, glow, glowTilt });
   useGlobeDrag(globe);
+  // Past the useTexture suspend, so the mask is in: the loader can lift.
+  useEffect(markSphereReady, []);
 
   const segments = [1, widthSegments, heightSegments] as const;
 
@@ -77,6 +81,8 @@ export default function WireframeSphere() {
       {/* Inside frame so it travels and scales with the globe, but above the drag
           and spin nodes, so the baked colour sweep never turns with it. */}
       <GlobeGlow materialRef={glow} tiltRef={glowTilt} />
+
+      <Waypoints spin={spin} />
 
       <group ref={globe}>
         {/*

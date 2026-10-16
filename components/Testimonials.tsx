@@ -1,51 +1,10 @@
+import Link from "next/link";
+
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
+import { AFFILIATIONS, TESTIMONIALS } from "@/lib/work";
 
-const TESTIMONIALS = [
-  {
-    quote:
-      "They took a name on a napkin and handed back a company. Brand, site, and filings done before our first customer call.",
-    name: "Marcus Reed",
-    role: "Founder, Reed & Co.",
-  },
-  {
-    quote:
-      "The only agency we've worked with that asked about our margins before our logo. It showed in everything after.",
-    name: "Alina Vasquez",
-    role: "COO, Northbound",
-  },
-  {
-    quote:
-      "We launched in six weeks. The positioning work is still what our sales team leads with two years on.",
-    name: "Devon Blake",
-    role: "CEO, Halcyon Labs",
-  },
-  {
-    quote:
-      "They built the thing, then taught us to run it. No lock-in, no retainer we didn't ask for.",
-    name: "Priya Raman",
-    role: "Director, Copperline",
-  },
-  {
-    quote:
-      "Our first hire read the brand guide and knew what we stood for. That saved us a month of onboarding.",
-    name: "Theo Okafor",
-    role: "Partner, Vantage Group",
-  },
-] as const;
 
-/** How many testimonials survive below the md breakpoint. */
-const MOBILE_VISIBLE = 3;
-
-/** Placeholder slots — swap the label for a logo <Image> as partners are signed. */
-const AFFILIATIONS = [
-  "Kyro & Bros.",
-  "HWY6 Studios",
-  "Halcyon Labs",
-  "Studio Meridian",
-  "Copperline",
-  "Vantage Group",
-] as const;
+const [FEATURED, ...REST] = TESTIMONIALS;
 
 const initials = (name: string) =>
   name
@@ -57,85 +16,122 @@ const initials = (name: string) =>
 export default function Testimonials() {
   return (
     <section data-panel className="grid min-h-screen p-8 md:p-16 xl:p-24">
-      <div className="flex min-w-0 flex-col items-center justify-center text-center">
-        <h2 className="flex items-center justify-center gap-4 text-2xl font-extralight tracking-widest uppercase md:gap-6 md:text-7xl">
-          <span
-            aria-hidden="true"
-            className="shrink-0 text-sm text-foreground/40 select-none"
+      {/* Left edge, full width: the sphere is pole-on and near-invisible on this
+          panel (SPHERE_PATH desktop index 3), so nothing has to make room. */}
+      <div className="flex min-w-0 flex-col justify-center">
+        <div className="flex w-full max-w-6xl flex-col items-start text-left lg:max-w-7xl">
+          {/* red-700 light, red-500 dark: the two steps that clear AA here. */}
+          <p
+            data-unfold
+            className="font-mono text-[0.65rem] tracking-[0.35em] text-red-700 uppercase md:text-xs lg:text-sm dark:text-red-500"
           >
-            &bull;
-          </span>
-          <span>In good company</span>
-          <span
-            aria-hidden="true"
-            className="shrink-0 text-sm text-foreground/40 select-none"
+            In good company
+          </p>
+
+          <h2
+            data-unfold
+            className="mt-3 text-[clamp(1.6rem,3.6vw,3.5rem)] leading-[1.08] font-bold tracking-tight text-balance"
           >
-            &bull;
-          </span>
-        </h2>
+            <span>Ask the people who were here before you.</span>{" "}
+          </h2>
 
-        <p className="mt-5 max-w-2xl text-xs leading-relaxed font-bold text-foreground/70 md:mt-8 md:text-lg">
-          We measure ourselves by what our partners build after we hand the keys
-          back. These are the founders and operators who trusted us early, and
-          the organisations we keep good company with.
-        </p>
+          <p
+            data-unfold
+            className="mt-4 max-w-xl font-mono text-xs leading-relaxed text-foreground/70 md:text-sm lg:max-w-2xl lg:text-base"
+          >
+            We measure ourselves by what our partners build after we hand the
+            keys back. Every name below will take your call — we make the
+            introduction ourselves.
+          </p>
 
-        <ul className="mt-6 flex w-full max-w-5xl flex-wrap justify-center gap-3 text-left md:mt-8">
-          {TESTIMONIALS.map((t, i) => (
-            <li
-              key={t.name}
-              /* Below md the cards stack one per row, so five of them run the
-                 panel well past a single screen. Show the first three there. */
-              className={`basis-full sm:basis-[calc(50%-0.375rem)] lg:basis-[calc(33.333%-0.5rem)] ${
-                i >= MOBILE_VISIBLE ? "max-md:hidden" : ""
-              }`}
+          {/* The quote's rule is its own element so it can draw in. */}
+          <div
+            aria-hidden="true"
+            data-unfold="draw"
+            className="mt-8 h-px w-full max-w-4xl bg-foreground/15 lg:mt-10"
+          />
+
+          {/* Gelasio is the client's voice; the sans stays ours. */}
+          <blockquote className="w-full max-w-4xl pt-7 lg:pt-9">
+            <p
+              data-unfold
+              className="font-gelasio text-[clamp(1.15rem,2.6vw,2.5rem)] leading-[1.36] tracking-tight italic text-pretty"
             >
-              <Card className="h-full border-foreground/15 bg-foreground/5">
-                <CardContent className="flex h-full flex-col gap-3">
-                  <p className="text-sm leading-relaxed font-light text-foreground/80">
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-                  <div className="mt-auto flex items-center gap-3">
-                    <Avatar className="size-8">
-                      <AvatarFallback className="bg-foreground/10 text-[0.65rem] tracking-widest text-foreground/70 uppercase">
-                        {initials(t.name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="text-xs tracking-widest text-foreground uppercase">
-                        {t.name}
-                      </p>
-                      <p className="text-xs font-light text-foreground/50">
-                        {t.role}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </li>
-          ))}
-        </ul>
+              <span className="text-red-700 dark:text-red-500">&ldquo;</span>
+              {FEATURED.quote}
+              <span className="text-red-700 dark:text-red-500">&rdquo;</span>
+            </p>
 
-        {/*
-         * Logo ticker. The list is rendered twice and the track slides exactly
-         * -50%, so the second copy lands where the first began — a seamless loop
-         * with no JS. The mask fades both ends instead of hard-cutting.
-         */}
-        <div
-          className="mt-6 w-full min-w-0 max-w-5xl overflow-hidden md:mt-8 [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]"
-          aria-label="Affiliations"
-        >
-          <ul className="flex w-max animate-[ticker_38s_linear_infinite] items-center gap-12 motion-reduce:animate-none md:gap-20">
-            {[...AFFILIATIONS, ...AFFILIATIONS].map((name, i) => (
-              <li
-                key={`${name}-${i}`}
-                aria-hidden={i >= AFFILIATIONS.length ? "true" : undefined}
-                className="shrink-0 text-xs tracking-widest whitespace-nowrap text-foreground/40 uppercase transition-colors hover:text-foreground/70 md:text-sm"
+            <div data-unfold className="mt-5 flex items-center gap-3 lg:mt-7">
+              <Avatar className="size-9 lg:size-11">
+                <AvatarFallback className="bg-transparent font-mono text-[0.6rem] tracking-widest text-foreground/60 uppercase ring-1 ring-foreground/15">
+                  {initials(FEATURED.name)}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-[0.7rem] tracking-widest text-foreground uppercase lg:text-xs">
+                  {FEATURED.name}
+                </p>
+                <p className="text-xs font-light text-foreground/50 lg:text-sm">
+                  {FEATURED.role}
+                </p>
+              </div>
+            </div>
+
+            {/* The label is the promise: this line is meant to be checkable. */}
+            <p
+              data-unfold
+              className="mt-5 inline-flex flex-wrap items-baseline gap-x-3 border-t border-foreground/15 pt-3 font-mono text-[0.65rem] tracking-[0.1em] text-foreground/60 lg:mt-7 lg:text-xs"
+            >
+              <span className="tracking-[0.18em] text-red-700 uppercase dark:text-red-500">
+                Since
+              </span>
+              {FEATURED.since}
+            </p>
+          </blockquote>
+
+          {/* The buttons and the ticker build as one beat. */}
+          <div data-unfold className="w-full min-w-0">
+            <div className="mt-8 flex flex-wrap items-center gap-4 lg:mt-10">
+              <a
+                href="#"
+                className="rounded-lg bg-foreground px-6 py-3 text-xs tracking-widest text-background uppercase transition-colors hover:bg-foreground/80 lg:px-8 lg:py-4 lg:text-sm"
               >
-                {name}
-              </li>
-            ))}
-          </ul>
+                Ask them yourself
+              </a>
+              <Link
+                href="/affiliations#voices"
+                className="rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10 lg:px-8 lg:py-4 lg:text-sm"
+              >
+                Read the full stories
+              </Link>
+              <p className="font-mono text-[0.65rem] tracking-[0.16em] text-foreground/45 uppercase lg:text-xs">
+                {REST.length} more founders
+              </p>
+            </div>
+
+            {/*
+             * Logo ticker. The list is rendered twice and the track slides exactly
+             * -50%, so the second copy lands where the first began — a seamless loop
+             * with no JS. The mask fades both ends instead of hard-cutting.
+             */}
+            <div
+              className="mt-8 w-full min-w-0 overflow-hidden border-t border-foreground/15 pt-5 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] lg:mt-10 lg:pt-7"
+              aria-label="Affiliations"
+            >
+              <ul className="flex w-max animate-[ticker_38s_linear_infinite] items-center gap-12 motion-reduce:animate-none md:gap-20">
+                {[...AFFILIATIONS, ...AFFILIATIONS].map((name, i) => (
+                  <li
+                    key={`${name}-${i}`}
+                    aria-hidden={i >= AFFILIATIONS.length ? "true" : undefined}
+                    className="shrink-0 font-mono text-[0.65rem] tracking-[0.18em] whitespace-nowrap text-foreground/40 uppercase transition-colors hover:text-foreground/70 lg:text-xs"
+                  >
+                    {name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -2,7 +2,8 @@
  * Where the sphere sits on each full-screen panel, per layout.
  *
  * To add a screen: add a <section data-panel> to app/page.tsx and append one
- * entry to BOTH paths below. Order must match document order.
+ * entry to BOTH paths below. Order must match document order — reordering the
+ * panels means reordering these with them, or a panel inherits the wrong pose.
  *
  * Index 0 is the sphere's starting state. Every later entry is the state it
  * animates to as that panel scrolls into view.
@@ -16,6 +17,17 @@ export type RingState = {
   floor?: number;
   thickness?: number;
   size?: number;
+  /** 0 = Gaussian halo (default), 1 = flat banded ring system. */
+  disc?: number;
+  /** Annulus bounds in globe radii. Only read when `disc` is above 0. */
+  inner?: number;
+  outer?: number;
+  /** Division across the annulus: 0 is the inner edge, 1 the outer. */
+  gap?: number;
+  gapWidth?: number;
+  /** Ringlets across the annulus. Depth 0 is featureless. */
+  bandFreq?: number;
+  bandDepth?: number;
 };
 
 export type SphereState = {
@@ -35,29 +47,130 @@ export type Layout = "desktop" | "mobile";
 /** Matches Tailwind's `md`. Keep these in sync. */
 export const BREAKPOINT_MD = 768;
 
-/** Panels opt in explicitly, so unrelated <section> tags can't shift the timing. */
 export const PANEL_SELECTOR = "[data-panel]";
 
 export const SPHERE_PATH: Record<Layout, SphereState[]> = {
-  // Beside the copy: right on panel one, left on panel two.
-  //
-  // The tilt leans through the middle of the page and unwinds to nothing on
-  // the globe panel, so the sphere arrives upright and square to the viewer
-  // just as it becomes something to handle, then leans off again for the work.
-  // That panel is also the only one that lights the halo — see `glow`.
   desktop: [
-    { x: 0.9, y: 0, rotY: Math.PI * -0.13, rotX: Math.PI * 0.12, zoom: 1.65, opacity: 0.3, glow: 1, ring: { tilt: 1.1, radius: 1.5 } },
-    { x: -1.4, y: 0, rotY: Math.PI * -0.5, rotX: Math.PI * -0.1, zoom: 1.2, opacity: 0.5, glow: 1, ring: { tilt: 1.65, radius: 1.45 } },
-    { x: 0, y: -0.3, rotY: Math.PI * 0.1, rotX: Math.PI * 0.5, zoom: 2.5, opacity: 0.1,},
-    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.8, opacity: 1, glow: 1, ring: {spread: 0.1, floor: 1.06} },
-    { x: -1.7, y: 0.25, rotY: Math.PI * 1.9, rotX: Math.PI * 0.16, zoom: 1.7, opacity: 0.05, glow: 1, ring: { tilt: 1.57, radius: 1.45 }},
+    {
+      x: 1.5,
+      y: 0,
+      rotY: Math.PI * -0.13,
+      rotX: Math.PI * 0.12,
+      zoom: 1.95,
+      opacity: 0.3,
+      glow: 1,
+      ring: { tilt: 1.18, radius: 1.25, floor: 1.02 },
+    },
+    {
+      x: -1.4,
+      y: 0,
+      rotY: Math.PI * -0.5,
+      rotX: Math.PI * -0.1,
+      zoom: 1.2,
+      opacity: 0.5,
+      glow: 1,
+      ring: { tilt: 1.15, radius: 1.45, floor: 1.02 },
+    },
+    {
+      x: -1.7,
+      y: 0.25,
+      rotY: Math.PI * 1.9,
+      rotX: Math.PI * 0.16,
+      zoom: 1.7,
+      opacity: 0.05,
+      glow: 1,
+      ring: { tilt: 1.25, radius: 1.45, floor: 1.02 },
+    },
+    {
+      x: 0,
+      y: -0.3,
+      rotY: Math.PI * 0.1,
+      rotX: Math.PI * 0.5,
+      zoom: 2.5,
+      opacity: 0.02,
+    },
+    {
+      x: 0,
+      y: 0,
+      rotY: Math.PI * 1.5,
+      rotX: 0,
+      zoom: 0.8,
+      opacity: 1,
+      glow: 1,
+      ring: { spread: 0.1, floor: 1.06, tilt: 0 },
+    },
+    // Careers: the sphere leaves to the right and dims out of the way.
+    {
+      x: 1.9,
+      y: -0.2,
+      rotY: Math.PI * 1.85,
+      rotX: Math.PI * 0.06,
+      zoom: 1.45,
+      opacity: 0.06,
+      glow: 0.4,
+      ring: { spread: 0.14, floor: 1.06, tilt: 0.25 },
+    },
   ],
   mobile: [
-    { x: 0, y: 0.75, rotY: 0, rotX: Math.PI * 0.12, zoom: 0.95, opacity: 0.2, glow: 1, ring: { tilt: 2.2, radius: 1.5 } },
-    { x: 0, y: 0, rotY: Math.PI * 0.6, rotX: Math.PI * 0.18, zoom: 0.75, opacity: 0.08, glow: 1, ring: { tilt: 1.85, radius: 1.45 } },
-    { x: 0, y: -0.9, rotY: Math.PI * 1.1, rotX: Math.PI * 0.1, zoom: 1.6, opacity: 0.06, glow: 1, ring: { tilt: 1.05, radius: 1.45 } },
-    { x: 0, y: 0, rotY: Math.PI * 1.5, rotX: 0, zoom: 0.85, opacity: 1, glow: 1 },
-    { x: 0, y: 0.02, rotY: Math.PI * 2, rotX: Math.PI * 0.3, zoom: 1.1, opacity: 0.04, glow: 1, ring: { tilt: 1.17, radius: 1.45 } },
+    {
+      x: 0,
+      y: 0.75,
+      rotY: 0,
+      rotX: Math.PI * 0.12,
+      zoom: 0.95,
+      opacity: 0.2,
+      glow: 1,
+      ring: { tilt: 1.22, radius: 1.25, floor: 1.02 },
+    },
+    {
+      x: 0,
+      y: 0,
+      rotY: Math.PI * 0.6,
+      rotX: Math.PI * 0.18,
+      zoom: 0.75,
+      opacity: 0.08,
+      glow: 1,
+      ring: { tilt: 1.91, radius: 1.45, floor: 1.02 },
+    },
+    {
+      x: 0,
+      y: 0.02,
+      rotY: Math.PI * 2,
+      rotX: Math.PI * 0.3,
+      zoom: 1.1,
+      opacity: 0.04,
+      glow: 1,
+      ring: { tilt: 1.17, radius: 1.45, floor: 1.02 },
+    },
+    {
+      x: 0,
+      y: -0.9,
+      rotY: Math.PI * 1.1,
+      rotX: Math.PI * 0.1,
+      zoom: 1.6,
+      opacity: 0.03,
+      glow: 1,
+      ring: { tilt: 1.05, radius: 1.45, floor: 1.02 },
+    },
+    {
+      x: 0,
+      y: 0,
+      rotY: Math.PI * 1.5,
+      rotX: 0,
+      zoom: 0.85,
+      opacity: 1,
+      glow: 1,
+    },
+    // Careers: no room to send it sideways here, so it sinks and dims.
+    {
+      x: 0,
+      y: -1.05,
+      rotY: Math.PI * 1.85,
+      rotX: 0,
+      zoom: 1.25,
+      opacity: 0.05,
+      glow: 0.4,
+    },
   ],
 };
 
@@ -76,12 +189,13 @@ export const SPHERE_SEGMENTS: Record<Layout, [number, number]> = {
   mobile: [32, 16],
 };
 
-/**
- * Wireframe colour per theme. A white mesh is invisible on a light
- * background, so the lines invert with the theme.
- */
+// #332920 is the site's brand brown, lightened from dark mode's #171310
+// --background until it reads as brown rather than black at small sizes —
+// same value as --foreground in app/globals.css's :root. Light mode has no
+// brown surface of its own to borrow, so the sphere carries the color there
+// instead of black.
 export const SPHERE_COLOR: Record<"light" | "dark", string> = {
-  light: "#000000",
+  light: "#332920",
   dark: "#ffffff",
 };
 
@@ -94,16 +208,6 @@ export function maskUrlFor(width: number) {
   return width >= BREAKPOINT_MD ? SPHERE_MASK.desktop : SPHERE_MASK.mobile;
 }
 
-/**
- * The globe is two layers on one sphere: solid landmasses, and the wire
- * lattice over them that gives the shape an outline. They have to be separate
- * meshes because one material cannot be both filled and wireframe.
- *
- * Each layer's share of whatever opacity the current panel calls for. The land
- * carries the globe; the wire is structure drawn on top and reads heavier than
- * the land at matching values, so it runs lighter. Set `wire` to 0 for solid
- * continents alone, or `land` to 0 for the bare lattice the site had before.
- */
 export const SPHERE_LAYER_OPACITY = {
   land: 2,
   wire: 0.09,
@@ -113,23 +217,25 @@ export const SPHERE_WIRE_OFFSET = 1.003;
 
 export const GLOBE_GLOW = {
   /** How many motes. Baked at mount, so this one cannot be per-panel. */
-  count: 14000,
+  count: 48000,
   /** Ring radius in globe radii. 1 is exactly the silhouette. */
   ring: 1.18,
   /** Gaussian spread across the radius. Bigger is hazier. */
   spread: 0.07,
   /** Gaussian depth through the screen, in globe radii. */
   thickness: 0.07,
-  /** Hard inner limit, keeping the Gaussian's tail off the globe's face. */
   floor: 1.09,
-  /** Lean in radians. 0 is face-on; ~1.15 reads as Saturn, past 1.4 is a line. */
   tilt: 0,
-  /** Mote size in CSS pixels. */
   size: 1.5,
-  /** Brightness weighting toward the dim end. Baked, so not per-panel. */
-  contrast: 1.7,
-  /** Ceiling on brightness, before a panel's own `glow` scales it down. */
-  intensity: 2,
+  disc: 0,
+  inner: 1.25,
+  outer: 2,
+  gap: 0.55,
+  gapWidth: 0.05,
+  bandFreq: 6,
+  bandDepth: 0.35,
+  contrast: 1.1,
+  intensity: { desktop: 2, mobile: 1 } as Record<Layout, number>,
   /** Radians per second the ring turns in its own plane. */
   drift: 0.03,
   /** Bearing of the colour sweep, in radians. 0 runs left to right. */
@@ -138,11 +244,6 @@ export const GLOBE_GLOW = {
   colors: ["#E0413A", "#F4BC48", "#2FA05E"],
 } as const;
 
-/**
- * The one panel whose markup opts into spinning the globe by hand. Every other
- * panel leaves the sphere entirely to the scroll timeline, so interactivity is
- * scoped by which element exists in the DOM rather than by a runtime check.
- */
 export const GLOBE_STAGE_SELECTOR = "[data-globe-stage]";
 
 /** Radians of spin per pixel dragged. */
@@ -158,3 +259,36 @@ export const GLOBE_MAX_SPIN = 4;
 
 /** Below this speed the fling has effectively stopped; snap it to rest. */
 export const GLOBE_MIN_SPIN = 0.002;
+
+/** The canvas camera's fixed view. Nothing moves it; the sphere opens here. */
+export const CAMERA = { position: [0, 0, 10] as [number, number, number], fov: 16 };
+
+/** The post-loader intro, in seconds. The globe holds still; only the words build. */
+export const INTRO = {
+  /** Loader fade over the resting globe. */
+  dissolve: 0.6,
+  /** How far into the dissolve the words begin. */
+  wordsAt: 0.4,
+  /** How long a skip takes to catch the timeline up to its end. */
+  skip: 0.5,
+};
+
+/** Clip-path write-on, left to right. The negative bottom keeps script descenders. */
+export const SCRIPT_WIPE = {
+  // 105% on the right cancels the 5% overhang on the left, so it opens at zero width.
+  from: "inset(-15% 105% -30% -5%)",
+  to: "inset(-15% -5% -30% -5%)",
+};
+
+/** How a panel's copy builds once scrolling has stopped on it, in seconds. */
+export const UNFOLD = {
+  /** Stillness after the last scroll event before the build starts. */
+  settle: 0.15,
+  /** Each beat's length, and how far apart they start. */
+  duration: 0.7,
+  stagger: 0.12,
+  /** Pixels a beat rises through. */
+  rise: 20,
+  /** A slide travels in from past its container's edge, so it takes longer. */
+  slideDuration: 1.1,
+};
