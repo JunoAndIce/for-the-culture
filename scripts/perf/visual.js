@@ -14,9 +14,11 @@ async (page) => {
     // The window is headed, so a passing real cursor could start a hover fade mid-shot.
     const style = document.createElement('style');
     style.textContent = '*, *::before, *::after { pointer-events: none !important; transition: none !important; }';
-    document.documentElement.appendChild(style);
+    // Init scripts can run before the root element exists.
+    const add = () => document.documentElement.appendChild(style);
+    if (document.documentElement) add(); else document.addEventListener('DOMContentLoaded', add, { once: true });
   };
-  if (!globalThis.__ftcVisualInitV2) { await page.context().addInitScript(INIT); globalThis.__ftcVisualInitV2 = true; }
+  if (!globalThis.__ftcVisualInitV3) { await page.context().addInitScript(INIT); globalThis.__ftcVisualInitV3 = true; }
   const cdp = await page.context().newCDPSession(page);
   await page.bringToFront();
   try { const { windowId } = await cdp.send('Browser.getWindowForTarget'); await cdp.send('Browser.setWindowBounds', { windowId, bounds: { windowState: 'normal' } }); } catch {}
