@@ -17,6 +17,31 @@ let giveUp: gsap.core.Tween | null = null;
 const ready = new Set<Part>();
 const listeners = new Set<() => void>();
 
+// Spheres mounted, which means their mask has loaded. A cached mask never reaches
+// three's loading manager, so the loader waits on this, not on progress. A count:
+// the old page's sphere can unmount after the new page's has mounted.
+let spheres = 0;
+const sphereListeners = new Set<() => void>();
+
+/** The sphere has mounted. Returns its cleanup. */
+export function markSphereReady() {
+  spheres += 1;
+  sphereListeners.forEach((fn) => fn());
+  return () => {
+    spheres -= 1;
+    sphereListeners.forEach((fn) => fn());
+  };
+}
+
+export const isSphereReady = () => spheres > 0;
+
+export function subscribeSphereReady(fn: () => void) {
+  sphereListeners.add(fn);
+  return () => {
+    sphereListeners.delete(fn);
+  };
+}
+
 export function introTimeline() {
   return (timeline ??= gsap.timeline({
     paused: true,
@@ -56,6 +81,8 @@ export function whenIntroDone(fn: () => void) {
 
 /** The loader is ready to reveal the page. */
 export function requestIntro() {
+  // A second request would leave a stray giveUp to cut the intro short.
+  if (phase !== "pending" || wanted) return;
   wanted = true;
   // A part that never arrives must not leave the copy hidden.
   giveUp = gsap.delayedCall(2, completeIntro);
