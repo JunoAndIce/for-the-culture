@@ -7,12 +7,15 @@ import {
   BREAKPOINT_MD,
   GLOBE_GLOW,
   PANEL_SELECTOR,
+  SERVICE_DECK_SELECTOR,
+  SERVICE_TURN,
   SPHERE_LAYER_OPACITY,
   SPHERE_PATH,
   SPHERE_SCALE,
   type Layout,
   type SphereState,
 } from "@/lib/choreography";
+import { onSphereTurn } from "@/lib/sphereTurn";
 
 /**
  * The parts of the sphere this hook drives. They are separate nodes because
@@ -116,13 +119,13 @@ function buildTimeline(
   reduceMotion: boolean,
 ) {
   const panels = gsap.utils.toArray<HTMLElement>(PANEL_SELECTOR);
-  if (panels.length < 2) return;
+  if (panels.length < 2) return false;
 
   // One timeline on one ScrollTrigger. Independent scrubbed triggers hand off at
   // a hard boundary, which writes the next tween's from-value in a single frame.
   const tops = panels.map((el) => el.offsetTop);
   const span = tops[tops.length - 1] - tops[0];
-  if (span <= 0) return;
+  if (span <= 0) return false;
 
   const tl = gsap.timeline({
     defaults: { ease: "none" },
@@ -146,6 +149,47 @@ function buildTimeline(
       tl.to(target, { ...vars, duration }, k > 0 ? "<" : i === 0 ? 0 : ">");
     });
   });
+  return true;
+}
+
+/**
+ * With no panels to scroll through, a service deck turns the spin node instead:
+ * a step per card, eased, with a slow drift underneath. Returns its cleanup.
+ */
+function turnWithDeck(n: Resolved, state: SphereState, reduceMotion: boolean) {
+  const motion = { step: 0, drift: 0 };
+  const apply = () => {
+    n.spin.rotation.y = state.rotY + motion.step + motion.drift;
+  };
+
+  const drift = (_time: number, deltaMs: number) => {
+    motion.drift += (SERVICE_TURN.drift * deltaMs) / 1000;
+    apply();
+  };
+  if (!reduceMotion) gsap.ticker.add(drift);
+
+  const off = onSphereTurn((index, instant) => {
+    const step = index * SERVICE_TURN.step;
+    if (instant || reduceMotion) {
+      gsap.killTweensOf(motion);
+      motion.step = step;
+      apply();
+      return;
+    }
+    gsap.to(motion, {
+      step,
+      duration: SERVICE_TURN.duration,
+      ease: "power3.out",
+      overwrite: true,
+      onUpdate: apply,
+    });
+  });
+
+  return () => {
+    gsap.ticker.remove(drift);
+    off();
+    gsap.killTweensOf(motion);
+  };
 }
 
 // Tall panels rest anywhere from their top to their bottom edge. Between panels
@@ -266,7 +310,10 @@ export function useSphereScroll(nodes: SphereNodes) {
             gsap.set(target, vars),
           );
 
-          buildTimeline(n, path, layout, reduceMotion);
+          const built = buildTimeline(n, path, layout, reduceMotion);
+          if (!built && document.querySelector(SERVICE_DECK_SELECTOR)) {
+            return turnWithDeck(n, path[0], reduceMotion);
+          }
         },
       );
     },
