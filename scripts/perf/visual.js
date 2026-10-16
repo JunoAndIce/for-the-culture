@@ -49,6 +49,8 @@ async (page) => {
   };
 
   const shoot = async (view, base, canvasOnly) => {
+    // Re-raised per shot: a covered or minimised window throttles frames mid-run.
+    await page.bringToFront();
     await cdp.send('Emulation.setDeviceMetricsOverride', { width: view.w || 1440, height: view.h || 900, deviceScaleFactor: view.dpr, mobile: !!view.mobile });
     await cdp.send('Emulation.setEmulatedMedia', { features: view.reduced ? [{ name: 'prefers-reduced-motion', value: 'reduce' }] : [] });
     await view.run(base);

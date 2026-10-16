@@ -33,6 +33,30 @@ async (page) => {
     new PerformanceObserver((l) => { for (const e of l.getEntries()) window.__long.push(Math.round(e.duration)); }).observe({ type: 'longtask', buffered: true });
   };
 
+  // Draw calls, counted separately so it registers even where INIT already has.
+  const DRAWS = () => {
+    if (window.__draws !== undefined) return;
+    window.__draws = 0;
+    const P = WebGL2RenderingContext.prototype;
+    for (const name of ['drawArrays', 'drawElements', 'drawArraysInstanced', 'drawElementsInstanced']) {
+      const original = P[name];
+      P[name] = function () { window.__draws++; return original.apply(this, arguments); };
+    }
+  };
+  const drawsPerFrame = () => new Promise((resolve) => {
+    const d0 = window.__draws; let frames = 0; const start = performance.now();
+    const tick = (now) => { frames++; if (now - start < 1000) requestAnimationFrame(tick); else resolve(+((window.__draws - d0) / frames).toFixed(2)); };
+    requestAnimationFrame(tick);
+  });
+  const pinWritesPerSecond = () => new Promise((resolve) => {
+    const pin = document.querySelector('button[aria-label^="Houston"]');
+    if (!pin) return resolve(null);
+    let n = 0;
+    const observer = new MutationObserver((records) => { n += records.length; });
+    observer.observe(pin, { attributes: true, attributeFilter: ['style', 'data-back'] });
+    setTimeout(() => { observer.disconnect(); resolve(n); }, 1000);
+  });
+
   const sampleFrames = (ms) => new Promise((resolve) => {
     const t = []; const start = performance.now();
     const tick = (now) => { t.push(now); if (now - start < ms) requestAnimationFrame(tick); else {
@@ -46,6 +70,7 @@ async (page) => {
   // One persistent page: viewport and pixel density come from DevTools overrides.
   const p = page;
   if (!globalThis.__ftcInit) { await p.context().addInitScript(INIT); globalThis.__ftcInit = true; }
+  if (!globalThis.__ftcDraws) { await p.context().addInitScript(DRAWS); globalThis.__ftcDraws = true; }
   const cdp = await p.context().newCDPSession(p);
   await cdp.send('Performance.enable');
   // An occluded or minimised window throttles rAF to ~1Hz, so bring it up first.
@@ -53,6 +78,7 @@ async (page) => {
   try { const { windowId } = await cdp.send('Browser.getWindowForTarget'); await cdp.send('Browser.setWindowBounds', { windowId, bounds: { windowState: 'normal' } }); } catch {}
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
   const emulate = async (dpr, w = 1440, h = 900, mobile = false) => {
+    await p.bringToFront();
     await cdp.send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: dpr, mobile });
     await p.goto('about:blank');
   };
@@ -77,6 +103,14 @@ async (page) => {
       for (const el of panels.slice(1)) { window.scrollTo({ top: el.offsetTop, behavior: 'smooth' }); await new Promise((s) => setTimeout(s, 1400)); }
       return frames;
     });
+    // Panel 3 hides the ring (glow 0); panel 4 holds the sphere still under the pin.
+    if (dpr === 1) {
+      for (const [k, key, probe] of [[3, 'panel3DrawsPerFrame', drawsPerFrame], [4, 'panel4PinWritesPerSecond', pinWritesPerSecond]]) {
+        await p.evaluate((k) => window.scrollTo(0, document.querySelectorAll('[data-panel]')[k].offsetTop), k);
+        await p.waitForTimeout(2600);
+        r.home[key] = await p.evaluate(probe);
+      }
+    }
 
     // Overview: idle, then a deck glide.
     await p.goto(BASE + '/overview', { waitUntil: 'load' });

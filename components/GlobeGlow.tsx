@@ -172,7 +172,9 @@ export default function GlobeGlow({
   useFrame((_, delta) => {
     const node = spin.current;
     if (!node) return;
-    if ((materialRef.current?.uniforms.uOpacity.value ?? 0) <= 0.001) return;
+    // Faded out, the 48k motes would still be drawn at zero alpha, so skip the draw too.
+    node.visible = (materialRef.current?.uniforms.uOpacity.value ?? 0) > 0.001;
+    if (!node.visible) return;
     // About Z, the ring's own normal, so it turns within its plane.
     node.rotation.z += GLOBE_GLOW.drift * delta;
   });
