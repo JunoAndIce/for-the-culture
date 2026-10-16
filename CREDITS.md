@@ -14,13 +14,12 @@ Third-party assets used on this site, and where they came from.
 
 ## Fonts
 
-**Cochocib Script** — used for the script line on the services panel.
+**Cochocib Script** — not loaded by the site any more; the file is kept.
 
 - Source file: `fonts/Cochocib Script Free.otf`
 - Licence: **unconfirmed.** "Free" in a script face's filename usually means
-  free for personal use, not commercial. Check the foundry's terms before this
-  ships. Nothing else in the build depends on it — one `localFont` call in
-  `app/layout.tsx` and the `font-cochocib` class.
+  free for personal use, not commercial. Check the foundry's terms before
+  loading it again with a `localFont` call in `app/layout.tsx`.
 
-Geist, Geist Mono, Inter, Gelasio, and Italianno, all served through
+Geist Mono, Inter, Gelasio, and Italianno, all served through
 `next/font/google`. Open source under the SIL Open Font License.
