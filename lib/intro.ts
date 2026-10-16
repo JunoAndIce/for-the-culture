@@ -1,10 +1,10 @@
 import { gsap } from "@/lib/gsap";
 import { INTRO } from "@/lib/choreography";
 
-// One timeline for the whole post-loader intro. The loader, the camera and the
-// words live in different React trees, so they meet here, like lib/waypoints.ts.
+// One timeline for the whole post-loader intro. The loader and the words live
+// in different React trees, so they meet here, like lib/waypoints.ts.
 
-type Part = "camera" | "words";
+type Part = "words";
 type Phase = "pending" | "playing" | "done";
 
 const SKIP_EVENTS = ["pointerdown", "keydown", "wheel", "touchstart"] as const;
@@ -64,7 +64,7 @@ export function requestIntro() {
 
 function maybeStart() {
   if (phase !== "pending" || !wanted) return;
-  if (!ready.has("camera") || !ready.has("words")) return;
+  if (!ready.has("words")) return;
   giveUp?.kill();
 
   // Reduced motion, or a reload partway down the page: nothing to play.

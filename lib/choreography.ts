@@ -260,23 +260,15 @@ export const GLOBE_MAX_SPIN = 4;
 /** Below this speed the fling has effectively stopped; snap it to rest. */
 export const GLOBE_MIN_SPIN = 0.002;
 
-/** The canvas camera's rest view. The intro pans in to exactly this. */
+/** The canvas camera's fixed view. Nothing moves it; the sphere opens here. */
 export const CAMERA = { position: [0, 0, 10] as [number, number, number], fov: 16 };
 
-/** The post-loader intro, in seconds. The camera makes the move, not the sphere. */
+/** The post-loader intro, in seconds. The globe holds still; only the words build. */
 export const INTRO = {
-  /** Loader fade, overlapping the start of the pan. */
+  /** Loader fade over the resting globe. */
   dissolve: 0.6,
-  pan: 3.2,
-  /** Camera start distance, centred on the planet. Rest is CAMERA.position[2]. */
-  pullBack: { desktop: 26, mobile: 19.6 } as Record<Layout, number>,
-  /** Camera start roll, in degrees. */
-  rollDeg: 6,
-  /** How far into the pan the words begin. */
-  wordsAt: 2,
-  /** The truck starts this late, and the roll settles in this share of the pan. */
-  truckLag: 0.1,
-  rollShare: 0.75,
+  /** How far into the dissolve the words begin. */
+  wordsAt: 0.4,
   /** How long a skip takes to catch the timeline up to its end. */
   skip: 0.5,
 };

@@ -17,7 +17,6 @@ import {
 import GlobeGlow from "./GlobeGlow";
 import Waypoints from "./Waypoints";
 import { useGlobeDrag } from "@/lib/useGlobeDrag";
-import { useIntroCamera } from "@/lib/useIntroCamera";
 import { useSphereScroll } from "@/lib/useSphereScroll";
 
 export default function WireframeSphere() {
@@ -63,7 +62,6 @@ export default function WireframeSphere() {
 
   useSphereScroll({ frame, spin, land, wire, glow, glowTilt });
   useGlobeDrag(globe);
-  useIntroCamera();
 
   const segments = [1, widthSegments, heightSegments] as const;
 
