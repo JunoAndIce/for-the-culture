@@ -11,9 +11,10 @@ npm run dev      # Next dev server (localhost:3000; falls back to 3001 if occupi
 npm run build    # production build
 npm run start    # serve the production build
 npm run lint     # ESLint (flat config: eslint-config-next core-web-vitals + typescript)
+npm test         # Node's built-in test runner over *.test.mjs, with type stripping
 ```
 
-There is no test suite / test script configured in this repo.
+Tests are few and sit next to the code they cover (`lib/greyPng.test.mjs`). `scripts/perf/` holds the perf and A/B visual checks, run through the Playwright MCP tool against `next start`; their headers say how.
 
 ## Stack
 
@@ -38,7 +39,7 @@ frame (position/scale — useSphereScroll)
          └─ land mesh, wire mesh (masked fill + wireframe overlay)
 ```
 
-`GlobeGlow` (the dust-ring shader) and `Waypoints` (DOM pin projector) are siblings inside `frame`, above `globe`, so the ring's tilt/color sweep never spins with the user's drag. This ordering is load-bearing — see the docblock on `useSphereScroll` in `lib/useGlobeDrag.ts` and `lib/useSphereScroll.ts` before changing it. Land and wireframe are two separate meshes (a material is either filled or wireframe, not both) sharing the mask texture (`public/earth-mask-{4k,8k}.png`, chosen by breakpoint via `maskUrlFor`).
+`GlobeGlow` (the dust-ring shader) and `Waypoints` (DOM pin projector) are siblings inside `frame`, above `globe`, so the ring's tilt/color sweep never spins with the user's drag. This ordering is load-bearing — see the docblock on `useSphereScroll` in `lib/useGlobeDrag.ts` and `lib/useSphereScroll.ts` before changing it. Land and wireframe are two separate meshes (a material is either filled or wireframe, not both) with the land's `alphaMap` as the mask (`public/earth-mask-{4k,8k}.png`, chosen by breakpoint and GPU texture limit via `maskUrlFor`). `MaskLoader` (`lib/maskLoader.ts`) decodes it with `lib/greyPng.ts` to one byte per pixel, a quarter of the RGBA a browser decodes an image to, so the land material reads alpha from `.r` rather than three's default `.g`.
 
 The camera never moves: `Scene` places it at `CAMERA` and nothing writes to it afterwards. The globe opens at `SPHERE_PATH[layout][0]`, which `useSphereScroll` sets before its triggers capture it, so the loader lifts onto exactly the pose the scroll timeline starts from.
 
@@ -72,4 +73,4 @@ Fonts are registered in `app/layout.tsx` via `next/font/google` (Geist, Geist Mo
 
 ## Assets
 
-`design/` holds source art not used at runtime (backgrounds, the `.blend` file, the 8k specular map). `public/earth-mask-{4k,8k}.png` are the only runtime-loaded sphere masks, generated from that source. `CREDITS.md` tracks licensing for everything third-party — check it before adding or shipping new assets.
+`design/` holds source art not used at runtime (backgrounds, the `.blend` file, the 8k specular map). `public/earth-mask-{4k,8k}.png` are the only runtime-loaded sphere masks, generated from that source. Keep them 8-bit greyscale, non-interlaced PNGs: anything else falls back to the browser's RGBA decode and four times the GPU memory. `CREDITS.md` tracks licensing for everything third-party — check it before adding or shipping new assets.

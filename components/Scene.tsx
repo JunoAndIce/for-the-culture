@@ -1,13 +1,14 @@
 "use client";
 
 import { Suspense } from "react";
-import { Canvas } from "@react-three/fiber";
-import { useTexture } from "@react-three/drei";
+import { Canvas, useLoader } from "@react-three/fiber";
 import WireframeSphere from "./WireframeSphere";
 import { CAMERA, maskUrlFor } from "@/lib/choreography";
+import { MaskLoader } from "@/lib/maskLoader";
 
+// No GPU to ask yet, so a device that can't take 8k loads 4k again at mount. Rare.
 if (typeof document !== "undefined") {
-  useTexture.preload(maskUrlFor(window.innerWidth));
+  useLoader.preload(MaskLoader, maskUrlFor(window.innerWidth));
 }
 
 export default function Scene() {

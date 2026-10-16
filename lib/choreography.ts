@@ -204,8 +204,11 @@ export const SPHERE_MASK: Record<Layout, string> = {
   mobile: "/earth-mask-4k.png",
 };
 
-export function maskUrlFor(width: number) {
-  return width >= BREAKPOINT_MD ? SPHERE_MASK.desktop : SPHERE_MASK.mobile;
+/** The 8k mask needs a GPU that takes 8192-wide textures; a DataTexture is never resized to fit. */
+export function maskUrlFor(width: number, maxTextureSize = Infinity) {
+  return width >= BREAKPOINT_MD && maxTextureSize >= 8192
+    ? SPHERE_MASK.desktop
+    : SPHERE_MASK.mobile;
 }
 
 export const SPHERE_LAYER_OPACITY = {
