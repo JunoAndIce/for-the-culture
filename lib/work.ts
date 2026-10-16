@@ -21,20 +21,6 @@ export const PROJECTS = [
     motif: "orbit",
   },
   {
-    slug: "powerwash",
-    name: "Hydro Cleaning",
-    discipline: "Physical Media and Website Launch",
-    summary:
-      "A Baton Rouge powerwashing company with two owners, a trailer, and no way for a neighbor to find them. We set them on For The Culture's path.",
-    detail:
-      "Christopher and Jered had the trailer, the insurance and the work ethic before they had a name anyone could repeat. We built the mark, the flyers and the door hangers first, because that is what a neighborhood actually sees, then the site to catch everyone the paper reached. The rate card went out front instead of behind a form, which is why the calls that come in now already know what a roof runs.",
-    badges: ["Brand Identity", "Physical Media", "Web Design", "Analytics"],
-    year: "2026",
-    build: "4 wks",
-    outcome: "2000+ site visits monthly",
-    motif: "contour",
-  },
-  {
     slug: "hwy6-studios",
     name: "HWY6 Studios",
     discipline: "Collective identity, brand architecture, drop platform",

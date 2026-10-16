@@ -22,22 +22,6 @@ const MOTIFS = {
       <ellipse cx={w / 2} cy={h / 2} rx={22 * k} ry={58 * k} />
     </>
   ),
-  contour: (w: number, h: number, k: number) => {
-    const gap = 22 * k * Math.sqrt(h / 180);
-    return (
-      <>
-        {[0, 1, 2, 3, 4].map((i) => {
-          const y = h / 2 - 2 * gap + 4 + i * gap;
-          return (
-            <path
-              key={i}
-              d={`M-10 ${y} C ${w * 0.28125} ${y - 40} ${w * 0.71875} ${y + 44} ${w + 10} ${y - 16}`}
-            />
-          );
-        })}
-      </>
-    );
-  },
   stack: (w: number, h: number) => {
     const rectHeight = 86 + (h - 180) * 0.23;
     const x = Math.round(w / 2 - 98);
