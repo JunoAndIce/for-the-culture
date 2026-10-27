@@ -67,12 +67,12 @@ export default function Careers() {
             data-unfold
             className="mt-8 flex flex-wrap items-center gap-4 lg:mt-10"
           >
-            <a
-              href="#"
+            <Link
+              href="/contact?topic=careers"
               className="rounded-lg bg-foreground px-6 py-3 text-xs tracking-widest text-background uppercase transition-colors hover:bg-foreground/80 lg:px-8 lg:py-4 lg:text-sm"
             >
               Send us your work
-            </a>
+            </Link>
             <Link
               href="/overview"
               className="rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10 lg:px-8 lg:py-4 lg:text-sm"

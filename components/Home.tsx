@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import ScrambleWord from "@/components/ScrambleWord";
 
 const VISION_WORDS = ["vision", "dream", "story", "brand", "legacy"] as const;
@@ -51,18 +53,18 @@ export default function Home() {
           data-intro="actions"
           className="mt-6 flex flex-wrap justify-center gap-4 md:mt-8 md:justify-start"
         >
-          <a
-            href="#"
+          <Link
+            href="/family#join"
             className="rounded-lg bg-foreground px-6 py-3 text-xs tracking-widest text-background uppercase transition-colors hover:bg-foreground/80"
           >
             Join us
-          </a>
-          <a
-            href="#"
+          </Link>
+          <Link
+            href="/overview"
             className="rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10"
           >
             See what we do
-          </a>
+          </Link>
         </div>
       </div>
 

@@ -57,18 +57,18 @@ export default function Services() {
           </ul>
 
           <div data-unfold className="mt-8 flex flex-wrap items-center gap-4">
-            <a
-              href="#"
+            <Link
+              href="/contact"
               className="rounded-lg bg-foreground px-6 py-3 text-xs tracking-widest text-background uppercase transition-colors hover:bg-foreground/80"
             >
               Start with a conversation
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              href="/affiliations"
               className="rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10"
             >
               See the work
-            </a>
+            </Link>
             <Link
               href="/overview"
               className="font-mono text-[0.65rem] tracking-[0.15em] text-foreground/50 uppercase transition-colors hover:text-foreground/80"

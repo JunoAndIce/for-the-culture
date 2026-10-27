@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { RefObject } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { AdditiveBlending, Color } from "three";
 import type { Group, Points, ShaderMaterial } from "three";
 import { GLOBE_GLOW } from "@/lib/choreography";
+import { onSceneRoute } from "@/lib/sceneRoute";
 
 /** Seeded, so the scatter is identical every reload and can be tuned against. */
 function mulberry32(seed: number) {
@@ -159,10 +160,21 @@ export default function GlobeGlow({
 
   const pixelRatio = useThree((state) => state.viewport.dpr);
 
+  // Each page used to get a fresh canvas, so the drift starts from zero per page.
+  useEffect(
+    () =>
+      onSceneRoute(() => {
+        if (spin.current) spin.current.rotation.z = 0;
+      }),
+    [],
+  );
+
   useFrame((_, delta) => {
     const node = spin.current;
     if (!node) return;
-    if ((materialRef.current?.uniforms.uOpacity.value ?? 0) <= 0.001) return;
+    // Faded out, the 48k motes would still be drawn at zero alpha, so skip the draw too.
+    node.visible = (materialRef.current?.uniforms.uOpacity.value ?? 0) > 0.001;
+    if (!node.visible) return;
     // About Z, the ring's own normal, so it turns within its plane.
     node.rotation.z += GLOBE_GLOW.drift * delta;
   });

@@ -49,6 +49,9 @@ export const BREAKPOINT_MD = 768;
 
 export const PANEL_SELECTOR = "[data-panel]";
 
+/** Pages that sit over the sphere. Anything else, a 404 included, gets no canvas. */
+export const SCENE_ROUTES: readonly string[] = ["/", "/overview", "/affiliations", "/family", "/contact"];
+
 export const SPHERE_PATH: Record<Layout, SphereState[]> = {
   desktop: [
     {
@@ -204,8 +207,11 @@ export const SPHERE_MASK: Record<Layout, string> = {
   mobile: "/earth-mask-4k.png",
 };
 
-export function maskUrlFor(width: number) {
-  return width >= BREAKPOINT_MD ? SPHERE_MASK.desktop : SPHERE_MASK.mobile;
+/** The 8k mask needs a GPU that takes 8192-wide textures; a DataTexture is never resized to fit. */
+export function maskUrlFor(width: number, maxTextureSize = Infinity) {
+  return width >= BREAKPOINT_MD && maxTextureSize >= 8192
+    ? SPHERE_MASK.desktop
+    : SPHERE_MASK.mobile;
 }
 
 export const SPHERE_LAYER_OPACITY = {
@@ -245,6 +251,31 @@ export const GLOBE_GLOW = {
 } as const;
 
 export const GLOBE_STAGE_SELECTOR = "[data-globe-stage]";
+
+/** A panel-less page with this element turns the sphere through lib/sphereTurn.ts. */
+export const SPHERE_TURN_SELECTOR = "[data-sphere-turn]";
+
+/** /overview: the sphere turns a step per service card, and drifts between turns. */
+export const SERVICE_TURN = {
+  /** Radians per card. */
+  step: Math.PI / 5,
+  /** Seconds a turn takes. */
+  duration: 1.4,
+  /** Radians per second between turns. */
+  drift: 0.035,
+};
+
+/** How the service deck reads its own scroll. */
+export const SERVICE_DECK = {
+  /** Share of the deck's width (or height) where the active card is read. */
+  focus: 0.35,
+  /** Stillness, in seconds, before a card that has landed builds. */
+  settle: 0.15,
+  /** A glide's seconds: a base, plus this much per card crossed, up to a cap. */
+  glide: 0.5,
+  glidePerCard: 0.15,
+  glideMax: 1.2,
+};
 
 /** Radians of spin per pixel dragged. */
 export const GLOBE_DRAG_SENSITIVITY = 0.006;

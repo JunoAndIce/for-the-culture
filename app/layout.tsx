@@ -1,20 +1,8 @@
 import type { Metadata } from "next";
-import {
-  Alex_Brush,
-  Gelasio,
-  Geist,
-  Geist_Mono,
-  Inter,
-  Italianno,
-} from "next/font/google";
-import localFont from "next/font/local";
+import { Gelasio, Geist_Mono, Inter, Italianno } from "next/font/google";
 import "./globals.css";
+import Scene from "@/components/Scene";
 import ThemeProvider from "@/components/ThemeProvider";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -35,26 +23,10 @@ const gelasio = Gelasio({
   subsets: ["latin"],
 });
 
-// The FTC mark. Named *-script for the same reason as the fonts above.
-const alexBrush = Alex_Brush({
-  variable: "--font-alex-brush-script",
-  subsets: ["latin"],
-  weight: "400",
-});
-
 const italianno = Italianno({
   variable: "--font-italianno",
   subsets: ["latin"],
   weight: "400",
-});
-
-// Self-hosted rather than from Google. Named *-script for the same reason as
-// inter and gelasio above: the Tailwind theme key `--font-cochocib` cannot
-// reference a variable of its own name. See globals.css.
-const cochocib = localFont({
-  src: "../fonts/Cochocib Script Free.otf",
-  variable: "--font-cochocib-script",
-  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -73,7 +45,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${gelasio.variable} ${italianno.variable} ${alexBrush.variable} ${cochocib.variable}`}
+      className={`${geistMono.variable} ${inter.variable} ${gelasio.variable} ${italianno.variable}`}
     >
       <body className="antialiased">
         <ThemeProvider
@@ -82,6 +54,7 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
+          <Scene />
           {children}
         </ThemeProvider>
       </body>

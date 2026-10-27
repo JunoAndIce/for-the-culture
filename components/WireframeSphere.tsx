@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useThree } from "@react-three/fiber";
-import { useTexture } from "@react-three/drei";
+import { useLoader, useThree } from "@react-three/fiber";
 import { useTheme } from "next-themes";
-import { NoColorSpace } from "three";
-import type { Group, MeshBasicMaterial, ShaderMaterial } from "three";
+import type {
+  Group,
+  MeshBasicMaterial,
+  ShaderMaterial,
+  WebGLProgramParametersWithUniforms,
+} from "three";
 import {
   BREAKPOINT_MD,
   SPHERE_COLOR,
@@ -17,8 +20,18 @@ import {
 import GlobeGlow from "./GlobeGlow";
 import Waypoints from "./Waypoints";
 import { markSphereReady } from "@/lib/intro";
+import { MaskLoader } from "@/lib/maskLoader";
 import { useGlobeDrag } from "@/lib/useGlobeDrag";
 import { useSphereScroll } from "@/lib/useSphereScroll";
+
+// The mask is one channel, so alpha comes from .r; a greyscale image fallback has r = g.
+const alphaFromRed = (shader: WebGLProgramParametersWithUniforms) => {
+  shader.fragmentShader = shader.fragmentShader.replace(
+    "#include <alphamap_fragment>",
+    "#ifdef USE_ALPHAMAP\n\tdiffuseColor.a *= texture2D( alphaMap, vAlphaMapUv ).r;\n#endif",
+  );
+};
+const alphaFromRedKey = () => "alphamap-r";
 
 export default function WireframeSphere() {
   // Three nested nodes, one writer each. Outside in: where the sphere sits,
@@ -42,10 +55,9 @@ export default function WireframeSphere() {
   const theme = resolvedTheme === "light" ? "light" : "dark";
   const color = SPHERE_COLOR[theme];
 
-  // Land/ocean mask. Tagged NoColorSpace because it is data, not colour —
-  // decoding it as sRGB would bend the mask values on the way in. Anisotropy
-  // matters here: near the sphere's edge the texture is sampled at a hard
-  // angle, which is exactly where coastlines would otherwise smear.
+  // Land/ocean mask, one byte per pixel (MaskLoader). Anisotropy matters here:
+  // near the sphere's edge the texture is sampled at a hard angle, which is
+  // exactly where coastlines would otherwise smear.
   //
   // Resolved once, at mount, rather than from the reactive canvas width above:
   // a URL that tracked the breakpoint would suspend and refetch the texture
@@ -53,13 +65,12 @@ export default function WireframeSphere() {
   // window.innerWidth to match the preload in Scene exactly.
   const gl = useThree((state) => state.gl);
   const [maskUrl] = useState(() =>
-    maskUrlFor(typeof window === "undefined" ? BREAKPOINT_MD : window.innerWidth),
+    maskUrlFor(
+      typeof window === "undefined" ? BREAKPOINT_MD : window.innerWidth,
+      gl.capabilities.maxTextureSize,
+    ),
   );
-  const mask = useTexture(maskUrl, (loaded) => {
-    const texture = Array.isArray(loaded) ? loaded[0] : loaded;
-    texture.colorSpace = NoColorSpace;
-    texture.anisotropy = gl.capabilities.getMaxAnisotropy();
-  });
+  const mask = useLoader(MaskLoader, maskUrl);
 
   useSphereScroll({ frame, spin, land, wire, glow, glowTilt });
   useGlobeDrag(globe);
@@ -105,6 +116,9 @@ export default function WireframeSphere() {
               ref={land}
               color={color}
               alphaMap={mask}
+              alphaMap-anisotropy={gl.capabilities.getMaxAnisotropy()}
+              onBeforeCompile={alphaFromRed}
+              customProgramCacheKey={alphaFromRedKey}
               transparent
               depthWrite={false}
             />

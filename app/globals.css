@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "./typeset.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -11,8 +10,6 @@
   --font-sans: var(--font-inter-sans);
   --font-mono: var(--font-geist-mono);
   --font-script: var(--font-italianno);
-  --font-cochocib: var(--font-cochocib-script);
-  --font-alex: var(--font-alex-brush-script);
   --font-inter: var(--font-inter-sans);
   --font-gelasio: var(--font-gelasio-serif);
   --font-heading: var(--font-sans);
@@ -204,20 +201,6 @@
   html {
     @apply font-sans;
   }
-}
-
-/*
- * Typeset preset for FTC prose blocks.
- * Usage: <div className="typeset typeset-ftc">…rendered markdown/HTML…</div>
- * Only affects content inside the container; it does not restyle the panels.
- */
-.typeset-ftc {
-  --typeset-font-body: var(--font-inter);
-  --typeset-font-heading: var(--font-inter);
-  --typeset-font-mono: var(--font-mono);
-  --typeset-size: 15px;
-  --typeset-leading: 1.75;
-  --typeset-flow: 1.25em;
 }
 
 /* Logo ticker. Track holds two copies of the list; -50% lands copy two
