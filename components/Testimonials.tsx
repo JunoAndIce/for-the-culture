@@ -93,17 +93,17 @@ export default function Testimonials() {
           {/* The buttons and the ticker build as one beat. */}
           <div data-unfold className="w-full min-w-0">
             <div className="mt-8 flex flex-wrap items-center gap-4 lg:mt-10">
-              <a
-                href="#"
+              <Link
+                href="/contact"
                 className="rounded-lg bg-foreground px-6 py-3 text-xs tracking-widest text-background uppercase transition-colors hover:bg-foreground/80 lg:px-8 lg:py-4 lg:text-sm"
               >
                 Ask them yourself
-              </a>
+              </Link>
               <Link
-                href="/affiliations#voices"
+                href="/affiliations"
                 className="rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10 lg:px-8 lg:py-4 lg:text-sm"
               >
-                Read the full stories
+                See what we&apos;ve built
               </Link>
               <p className="font-mono text-[0.65rem] tracking-[0.16em] text-foreground/45 uppercase lg:text-xs">
                 {REST.length} more founders

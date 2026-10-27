@@ -7,7 +7,7 @@ import {
   BREAKPOINT_MD,
   GLOBE_GLOW,
   PANEL_SELECTOR,
-  SERVICE_DECK_SELECTOR,
+  SPHERE_TURN_SELECTOR,
   SERVICE_TURN,
   SPHERE_LAYER_OPACITY,
   SPHERE_PATH,
@@ -258,7 +258,7 @@ function buildPage(n: Resolved, layout: Layout, reduceMotion: boolean) {
 
   const built = buildTimeline(n, path, layout, reduceMotion);
   if (!reduceMotion) buildPanelSnap();
-  if (!built && document.querySelector(SERVICE_DECK_SELECTOR)) {
+  if (!built && document.querySelector(SPHERE_TURN_SELECTOR)) {
     return turnWithDeck(n, path[0], reduceMotion);
   }
 }

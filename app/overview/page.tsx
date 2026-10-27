@@ -73,12 +73,12 @@ export default function OverviewPage() {
             </ol>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <a
-                href="#"
+              <Link
+                href="/contact"
                 className="rounded-lg bg-foreground px-6 py-3 text-xs tracking-widest text-background uppercase transition-colors hover:bg-foreground/80"
               >
                 Start with a conversation
-              </a>
+              </Link>
               <Link
                 href="/"
                 className="rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10"

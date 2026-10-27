@@ -50,7 +50,7 @@ export const BREAKPOINT_MD = 768;
 export const PANEL_SELECTOR = "[data-panel]";
 
 /** Pages that sit over the sphere. Anything else, a 404 included, gets no canvas. */
-export const SCENE_ROUTES: readonly string[] = ["/", "/overview", "/affiliations"];
+export const SCENE_ROUTES: readonly string[] = ["/", "/overview", "/affiliations", "/family", "/contact"];
 
 export const SPHERE_PATH: Record<Layout, SphereState[]> = {
   desktop: [
@@ -252,8 +252,8 @@ export const GLOBE_GLOW = {
 
 export const GLOBE_STAGE_SELECTOR = "[data-globe-stage]";
 
-/** A panel-less page with this element turns the sphere with its cards. */
-export const SERVICE_DECK_SELECTOR = "[data-service-deck]";
+/** A panel-less page with this element turns the sphere through lib/sphereTurn.ts. */
+export const SPHERE_TURN_SELECTOR = "[data-sphere-turn]";
 
 /** /overview: the sphere turns a step per service card, and drifts between turns. */
 export const SERVICE_TURN = {

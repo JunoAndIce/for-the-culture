@@ -218,7 +218,7 @@ export default function ServiceDeck() {
     <section
       ref={root}
       id="services"
-      data-service-deck
+      data-sphere-turn
       aria-label="Services"
       className="mt-12 scroll-mt-28 md:mt-16 md:scroll-mt-32"
     >

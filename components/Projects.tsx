@@ -165,12 +165,12 @@ export default function Projects() {
             </div>
 
             <div className="flex flex-wrap items-center gap-4">
-              <a
-                href="#"
+              <Link
+                href="/contact"
                 className="rounded-lg bg-foreground px-6 py-3 text-xs tracking-widest text-background uppercase transition-colors hover:bg-foreground/80 lg:px-8 lg:py-4 lg:text-sm"
               >
                 Start a project
-              </a>
+              </Link>
               <Link
                 href="/affiliations"
                 className="rounded-lg border border-foreground/40 px-6 py-3 text-xs tracking-widest text-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground/10 lg:px-8 lg:py-4 lg:text-sm"

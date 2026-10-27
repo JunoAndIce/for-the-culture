@@ -1,10 +1,10 @@
 /**
  * Single source for the work and the voices. The Projects and Testimonials
- * panels show the short form; /affiliations shows the rest.
+ * panels show the short form; /affiliations shows the work and BACKED.
  */
 
-// Placeholder work. Order here is the carousel order, and /affiliations makes
-// the first entry its hero, so the strongest build goes first.
+// Placeholder work. Order here is the carousel order. /affiliations shows only
+// Kyro & Bros. from here, the one brand FTC launched itself.
 export const PROJECTS = [
   {
     slug: "kyro-bros",
@@ -23,20 +23,66 @@ export const PROJECTS = [
   {
     slug: "hwy6-studios",
     name: "HWY6 Studios",
-    discipline: "Collective identity, brand architecture, drop platform",
+    discipline: "Backed by FTC",
     summary:
-      "A Houston creative collective working across film, fashion, athletics and community, running five brands nobody could tell were one. We built the system that holds them together.",
+      "A Houston creative collective working across film, fashion, athletics and community. It was already making work when we met, and we fund it.",
     detail:
-      "hwy6studios, hwy6archives, hwy6casting, 6athletics and hwy6tribe had each grown their own audience and their own look, and the collective underneath them was invisible from the outside. We built one identity loose enough that each arm keeps its voice and still reads as 6, then a single site where the pop-ups, the archive and the drops sit on the same shelf. Someone who came for the Bottega project can now find the casting page without being told it exists.",
-    badges: ["Identity", "Brand Architecture", "Drop Platform", "Art Direction"],
+      "With that backing HWY6 has launched two brands of its own, SHERUNSHOUSTON and 6athletics.",
+    badges: ["Funding", "SHERUNSHOUSTON", "6athletics"],
     year: "2025",
-    build: "6 wks",
-    outcome: "Five brands, one front door",
+    build: "Ongoing",
+    outcome: "Two brands launched with our backing",
     motif: "stack",
   },
 ] as const;
 
 export type Project = (typeof PROJECTS)[number];
+
+/** A brand HWY6 launched while FTC was funding it. */
+export type BackedBrand = {
+  slug: string;
+  name: string;
+  tagline?: string;
+  launched: string;
+  summary: string;
+  /** What the media slot should hold, until the real file is in. */
+  media: string;
+  link?: { label: string; href: string };
+};
+
+// HWY6 was running before FTC. FTC funds it, and these two launched with that backing.
+export const BACKED = {
+  slug: "hwy6-studios",
+  name: "HWY6 Studios",
+  site: { label: "Visit hwy6studios.com", href: "https://www.hwy6studios.com" },
+  summary:
+    "A Houston creative collective working across film, fashion, athletics and community. It was already making work when we met. We fund it, and with that backing it has started two brands of its own.",
+  brands: [
+    {
+      slug: "sherunshouston",
+      name: "SHERUNSHOUSTON",
+      tagline: "For the women who run this city.",
+      launched: "Launched November 2025",
+      summary:
+        "A brand for the women who run Houston, opened with a campaign film starring seven of them.",
+      media: "SHERUNSHOUSTON launch film, 16:10 loop",
+      link: {
+        label: "Watch the launch film",
+        href: "https://www.instagram.com/p/DQ-taF0Dcs_/",
+      },
+    },
+    {
+      slug: "6athletics",
+      name: "6athletics",
+      launched: "Launched with our backing",
+      summary:
+        "HWY6's athletics brand: the sport side of the collective, built for Houston's athletes and the people who train with them.",
+      media: "6athletics, 16:10 photo or loop",
+    },
+  ] satisfies BackedBrand[],
+  /** Already part of HWY6 before FTC came in. */
+  earlier: ["hwy6archives", "hwy6casting", "hwy6tribe"],
+};
 
 // `since` is a checkable outcome, not a claim: a real number the client would
 // confirm on a call, or the line comes out. Never soften it.
